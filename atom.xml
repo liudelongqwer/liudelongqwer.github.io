@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-19T03:55:28.219Z</updated>
+  <updated>2020-03-19T05:48:11.795Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,21 +17,17 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>&#39;linux&#39;</title>
-    <link href="http://yoursite.com/2020/03/18/linux/"/>
-    <id>http://yoursite.com/2020/03/18/linux/</id>
-    <published>2020-03-18T08:12:02.000Z</published>
-    <updated>2020-03-19T03:55:28.219Z</updated>
+    <title>nnnn</title>
+    <link href="http://yoursite.com/2020/03/19/nnnn/"/>
+    <id>http://yoursite.com/2020/03/19/nnnn/</id>
+    <published>2020-03-19T05:48:11.000Z</published>
+    <updated>2020-03-19T05:48:11.795Z</updated>
     
     <summary type="html">
     
     </summary>
     
     
-      <category term="ZABBIX" scheme="http://yoursite.com/categories/ZABBIX/"/>
-    
-    
-      <category term="linux" scheme="http://yoursite.com/tags/linux/"/>
     
   </entry>
   
