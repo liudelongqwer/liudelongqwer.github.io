@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2020/03/20/kubernetes/kubectl%20%E5%91%BD%E4%BB%A4%E6%8A%80%E5%B7%A7%E5%A4%A7%E5%85%A8/kubectl%20%E5%91%BD%E4%BB%A4%E6%8A%80%E5%B7%A7%E5%A4%A7%E5%85%A8/</loc>
+    
+    <lastmod>2020-03-20T06:18:20.349Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/03/20/kubernetes/pod%20%E7%8A%B6%E6%80%81/</loc>
     
     <lastmod>2020-03-20T06:10:23.812Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>http://yoursite.com/2020/03/19/web/web/</loc>
     
     <lastmod>2020-03-20T03:49:39.975Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/03/20/kubernetes/kubectl%20%E5%91%BD%E4%BB%A4%E6%8A%80%E5%B7%A7%E5%A4%A7%E5%85%A8/kubectl%20%E5%91%BD%E4%BB%A4%E6%8A%80%E5%B7%A7%E5%A4%A7%E5%85%A8/</loc>
-    
-    <lastmod>2020-03-20T03:49:16.206Z</lastmod>
     
   </url>
   
