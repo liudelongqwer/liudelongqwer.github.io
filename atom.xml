@@ -42,10 +42,10 @@
   
   <entry>
     <title>web</title>
-    <link href="http://yoursite.com/2020/03/19/web/web/"/>
-    <id>http://yoursite.com/2020/03/19/web/web/</id>
+    <link href="http://yoursite.com/2020/03/19/web/hexo%E4%BD%BF%E7%94%A8/"/>
+    <id>http://yoursite.com/2020/03/19/web/hexo%E4%BD%BF%E7%94%A8/</id>
     <published>2020-03-19T09:18:36.000Z</published>
-    <updated>2020-03-20T03:49:39.975Z</updated>
+    <updated>2020-03-20T06:36:47.948Z</updated>
     
     <content type="html"><![CDATA[<p>_config.yml配置git</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:  </span><br><span class="line">  type: &#39;git&#39;  </span><br><span class="line">  repo: git@github.com:liudelongqwer&#x2F;mengmo.github.io.git  </span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure><p>上传github，推送文件步骤：</p><p>hexo clean      hexo c   清除缓存文件 (db.json) 和已生成的静态文件 (public) hexo generate   hexo g   生成静态文件 hexo deploy     hexo d   部署网站 </p><p>执行端口启动：</p><p>hexo s -i 0.0.0.0 -p 8080 </p><p>绑定个人域名：</p><p>解析域名重点：博客网址中必须使用你github的用户名</p><p><strong>布局（Layout）</strong></p><p>Hexo 有三种默认布局：post、page 和 draft。在创建者三种不同类型的文件时，它们将会被保存到不同的路径；而您自定义的其他布局和 post 相同，都将储存到 source/_posts 文件夹。</p><table><thead><tr><th>布局</th><th>路径</th></tr></thead><tbody><tr><td>post</td><td>source/_posts</td></tr><tr><td>page</td><td>source</td></tr><tr><td>draft</td><td>source/_drafts</td></tr></tbody></table><p><strong>hexo init</strong></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo init [ folder]</span><br></pre></td></tr></table></figure><p>新建一个网站。如果没有设置 folder ，Hexo 默认在目前的文件夹建立网站。</p><p><strong>hexo new</strong></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new [layout] &lt;title&gt;</span><br></pre></td></tr></table></figure><p>新建一篇文章。如果没有设置 layout 的话，默认使用 _config.yml 中的 default_layout 参数代替。如果标题包含空格的话，请使用引号括起来。</p><p>hexo new “post title with whitespace” </p><table><thead><tr><th>参数</th><th>描述</th></tr></thead><tbody><tr><td>-p, –path</td><td>自定义新文章的路径</td></tr><tr><td>-r, –replace</td><td>如果存在同名文章，将其替换</td></tr><tr><td>-s, –slug</td><td>文章的 Slug，作为新文章的文件名和发布后的 URL</td></tr></tbody></table><p>默认情况下，Hexo 会使用文章的标题来决定文章文件的路径。对于独立页面来说，Hexo 会创建一个以标题为名字的目录，并在目录中放置一个 index.md 文件。你可以使用 –path 参数来覆盖上述行为、自行决定文件的目录：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page --path about&#x2F;me &quot;About me&quot;</span><br></pre></td></tr></table></figure><p>以上命令会创建一个 source/about/me.md 文件，同时 Front Matter 中的 title 为 “About me”</p><p>注意！title 是必须指定的！如果你这么做并不能达到你的目的：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page --path about&#x2F;me</span><br></pre></td></tr></table></figure><p>此时 Hexo 会创建 source/_posts/about/me.md，同时 me.md 的 Front Matter 中的 title 为 “page”。这是因为在上述命令中，hexo-cli 将 page 视为指定文章的标题、并采用默认的 layout。</p>]]></content>
     
@@ -59,6 +59,8 @@
     
     </summary>
     
+    
+      <category term="kubernetes" scheme="http://yoursite.com/categories/kubernetes/"/>
     
     
   </entry>
