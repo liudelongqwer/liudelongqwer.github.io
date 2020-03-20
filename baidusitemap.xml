@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://yoursite.com/2020/03/19/web/</loc>
+    <lastmod>2020-03-20</lastmod>
+  </url>  <url>
     <loc>http://yoursite.com/2020/03/20/kubernetes/kubectl%20%E5%91%BD%E4%BB%A4%E6%8A%80%E5%B7%A7%E5%A4%A7%E5%85%A8/</loc>
     <lastmod>2020-03-20</lastmod>
   </url>  <url>
-    <loc>http://yoursite.com/2020/03/20/%E5%91%BD%E4%BB%A4%E6%8A%80%E5%B7%A7%E5%A4%A7%E5%85%A8-k8s/</loc>
+    <loc>http://yoursite.com/2020/03/20/kubernetes/kubectl%20%E5%91%BD%E4%BB%A4%E6%8A%80%E5%B7%A7%E5%A4%A7%E5%85%A8/kubectl%20%E5%91%BD%E4%BB%A4%E6%8A%80%E5%B7%A7%E5%A4%A7%E5%85%A8/</loc>
     <lastmod>2020-03-20</lastmod>
   </url>  <url>
     <loc>http://yoursite.com/2020/03/20/kubernetes/</loc>
     <lastmod>2020-03-20</lastmod>
-  </url>  <url>
-    <loc>http://yoursite.com/2020/03/19/web/</loc>
-    <lastmod>2020-03-19</lastmod>
   </url>
 </urlset>
