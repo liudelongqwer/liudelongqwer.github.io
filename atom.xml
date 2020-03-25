@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-25T08:29:26.546Z</updated>
+  <updated>2020-03-25T08:49:37.927Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>伸缩服务</title>
+    <link href="http://yoursite.com/2020/03/25/%E4%BC%B8%E7%BC%A9%E6%9C%8D%E5%8A%A1/"/>
+    <id>http://yoursite.com/2020/03/25/%E4%BC%B8%E7%BC%A9%E6%9C%8D%E5%8A%A1/</id>
+    <published>2020-03-25T08:43:30.000Z</published>
+    <updated>2020-03-25T08:49:37.927Z</updated>
+    
+    <content type="html"><![CDATA[<p> 通过更改部署中的 replicas（副本数）来完成伸缩</p> <a id="more"></a>  <h2 id="Scaling（伸缩）应用程序"><a href="#Scaling（伸缩）应用程序" class="headerlink" title="Scaling（伸缩）应用程序"></a>Scaling（伸缩）应用程序</h2><p> <strong>伸缩</strong> 的实现可以通过更改 nginx-deployment.yaml 文件中部署的 replicas（副本数）来完成 </p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">4</span>    <span class="comment">#使用该Deployment创建两个应用程序实例</span></span><br></pre></td></tr></table></figure><p>修改了 Deployment 的 replicas 为 4 后，Kubernetes 又为该 Deployment 创建了 3 新的 Pod，这 4 个 Pod 有相同的标签。因此Service A通过标签选择器与新的 Pod建立了对应关系，将访问流量通过负载均衡在 4 个 Pod 之间进行转发。 </p><p> <img src="https://kuboard.cn/assets/img/module_05_scaling2.3f74dfba.svg" alt="Kubernetes教程：伸缩"> </p><h2 id="将-nginx-Deployment-扩容到-4-个副本"><a href="#将-nginx-Deployment-扩容到-4-个副本" class="headerlink" title="将 nginx Deployment 扩容到 4 个副本"></a>将 nginx Deployment 扩容到 4 个副本</h2><p>修改 nginx-deployment.yaml 文件，将 replicas 修改为 4</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-deployment</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">4</span>     <span class="comment">#通过更改部署中的 replicas（副本数）来完成扩展</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">nginx:1.7.9</span></span><br><span class="line">        <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure><p>执行命令：</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f nginx-deployment.yaml</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看结果</span></span><br><span class="line">watch kubectl get pods -o wide</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt; 通过更改部署中的 replicas（副本数）来完成伸缩&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="http://yoursite.com/categories/kubernetes/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>Service服务</title>
