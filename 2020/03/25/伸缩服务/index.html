@@ -22,14 +22,17 @@
 
   <meta name="description" content="通过更改部署中的 replicas（副本数）来完成伸缩">
 <meta property="og:type" content="article">
-<meta property="og:title" content="伸缩服务">
+<meta property="og:title" content="伸缩服务和滚动更新">
 <meta property="og:url" content="http://yoursite.com/2020/03/25/%E4%BC%B8%E7%BC%A9%E6%9C%8D%E5%8A%A1/index.html">
 <meta property="og:site_name" content="拒绝再玩">
 <meta property="og:description" content="通过更改部署中的 replicas（副本数）来完成伸缩">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://kuboard.cn/assets/img/module_05_scaling2.3f74dfba.svg">
+<meta property="og:image" content="https://kuboard.cn/assets/img/module_06_rollingupdates1.3f74dfba.svg">
+<meta property="og:image" content="https://kuboard.cn/assets/img/module_06_rollingupdates2.62afd5b1.svg">
+<meta property="og:image" content="https://kuboard.cn/assets/img/module_06_rollingupdates3.dc3754d9.svg">
 <meta property="article:published_time" content="2020-03-25T08:43:30.000Z">
-<meta property="article:modified_time" content="2020-03-25T08:49:37.927Z">
+<meta property="article:modified_time" content="2020-03-25T09:09:44.425Z">
 <meta property="article:author" content="duoyu">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://kuboard.cn/assets/img/module_05_scaling2.3f74dfba.svg">
@@ -47,7 +50,7 @@
   };
 </script>
 
-  <title>伸缩服务 | 拒绝再玩</title>
+  <title>伸缩服务和滚动更新 | 拒绝再玩</title>
   
 
 
@@ -165,7 +168,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          伸缩服务
+          伸缩服务和滚动更新
         </h1>
 
         <div class="post-meta">
@@ -176,7 +179,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-03-25 16:43:30 / 修改时间：16:49:37" itemprop="dateCreated datePublished" datetime="2020-03-25T16:43:30+08:00">2020-03-25</time>
+              <time title="创建时间：2020-03-25 16:43:30 / 修改时间：17:09:44" itemprop="dateCreated datePublished" datetime="2020-03-25T16:43:30+08:00">2020-03-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -212,6 +215,27 @@
 
 <p>执行命令：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f nginx-deployment.yaml</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看结果</span></span><br><span class="line">watch kubectl get pods -o wide</span><br></pre></td></tr></table></figure>
+
+<h1 id="滚动更新"><a href="#滚动更新" class="headerlink" title="滚动更新"></a>滚动更新</h1><p>用户期望应用程序始终可用，为此开发者/运维者在更新应用程序时要分多次完成。在 Kubernetes 中，这是通过 Rolling Update 滚动更新完成的。<strong>Rolling Update滚动更新</strong> 通过使用新版本的 Pod 逐步替代旧版本的 Pod 来实现 Deployment 的更新，从而实现零停机。新的 Pod 将在具有可用资源的 Node（节点）上进行调度。</p>
+<blockquote>
+<p>Kubernetes 更新多副本的 Deployment 的版本时，会逐步的创建新版本的 Pod，逐步的停止旧版本的 Pod，以便使应用一直处于可用状态。这个过程中，Service 能够监视 Pod 的状态，将流量始终转发到可用的 Pod 上。</p>
+</blockquote>
+<h2 id="滚动更新步骤"><a href="#滚动更新步骤" class="headerlink" title="滚动更新步骤"></a>滚动更新步骤</h2><p>1.原本 Service A 将流量负载均衡到 4 个旧版本的 Pod （当中的容器为 绿色）上 </p>
+<p> 1.原本 Service A 将流量负载均衡到 4 个旧版本的 Pod （当中的容器为 绿色）上 </p>
+<p> <img src="https://kuboard.cn/assets/img/module_06_rollingupdates1.3f74dfba.svg" alt="Kubernetes教程：滚动更新1"> </p>
+<p>2.更新完 Deployment 部署文件中的镜像版本后，master 节点选择了一个 worker 节点，并根据新的镜像版本创建 Pod（紫色容器）。新 Pod 拥有唯一的新的 IP。同时，master 节点选择一个旧版本的 Pod 将其移除。</p>
+<p>此时，Service A 将新 Pod 纳入到负载均衡中，将旧Pod移除</p>
+<p> <img src="https://kuboard.cn/assets/img/module_06_rollingupdates2.62afd5b1.svg" alt="Kubernetes教程：滚动更新2"> </p>
+<ol start="3">
+<li><p>同步骤2，再创建一个新的 Pod 替换一个原有的 Pod  <img src="https://kuboard.cn/assets/img/module_06_rollingupdates3.dc3754d9.svg" alt="Kubernetes教程：滚动更新3"> </p>
+</li>
+<li><p>如此 Rolling Update 滚动更新，直到所有旧版本 Pod 均移除，新版本 Pod 也达到 Deployment 部署文件中定义的副本数，则滚动更新完成 </p>
+<h2 id="更新-nginx-Deployment"><a href="#更新-nginx-Deployment" class="headerlink" title="更新 nginx Deployment"></a>更新 nginx Deployment</h2></li>
+</ol>
+<h6 id="修改-nginx-deployment-yaml-文件"><a href="#修改-nginx-deployment-yaml-文件" class="headerlink" title="修改 nginx-deployment.yaml 文件"></a><strong>修改 nginx-deployment.yaml 文件</strong></h6><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-deployment</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">4</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">nginx:1.8</span>   <span class="comment">#使用镜像nginx:1.8替换原来的nginx:1.7.9</span></span><br><span class="line">        <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+
+<p>执行命令</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f nginx-deployment.yaml</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看过程及结果，可观察到 pod 逐个被替换的过程。</span></span><br><span class="line">watch kubectl get pods -l app=nginx</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -289,7 +313,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Scaling（伸缩）应用程序"><span class="nav-number">1.</span> <span class="nav-text">Scaling（伸缩）应用程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将-nginx-Deployment-扩容到-4-个副本"><span class="nav-number">2.</span> <span class="nav-text">将 nginx Deployment 扩容到 4 个副本</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Scaling（伸缩）应用程序"><span class="nav-number">1.</span> <span class="nav-text">Scaling（伸缩）应用程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将-nginx-Deployment-扩容到-4-个副本"><span class="nav-number">2.</span> <span class="nav-text">将 nginx Deployment 扩容到 4 个副本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#滚动更新"><span class="nav-number"></span> <span class="nav-text">滚动更新</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#滚动更新步骤"><span class="nav-number">1.</span> <span class="nav-text">滚动更新步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新-nginx-Deployment"><span class="nav-number">2.</span> <span class="nav-text">更新 nginx Deployment</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#修改-nginx-deployment-yaml-文件"><span class="nav-number">2.0.0.0.1.</span> <span class="nav-text">修改 nginx-deployment.yaml 文件</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
