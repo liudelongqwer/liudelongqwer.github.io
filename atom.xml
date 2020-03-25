@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-20T07:20:09.424Z</updated>
+  <updated>2020-03-25T05:56:12.655Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>k8s部署一个应用程序</title>
+    <link href="http://yoursite.com/2020/03/25/k8s%E9%83%A8%E7%BD%B2%E4%B8%80%E4%B8%AA%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F/"/>
+    <id>http://yoursite.com/2020/03/25/k8s%E9%83%A8%E7%BD%B2%E4%B8%80%E4%B8%AA%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F/</id>
+    <published>2020-03-25T05:49:00.000Z</published>
+    <updated>2020-03-25T05:56:12.655Z</updated>
+    
+    <content type="html"><![CDATA[<p> 使用 kubectl 在 k8s 上部署第一个应用程序。 </p><h2 id="Deployment概念"><a href="#Deployment概念" class="headerlink" title="Deployment概念"></a>Deployment概念</h2> <a id="more"></a> <p>在k8s中，通过发布 Deployment，可以创建应用程序 (docker image) 的实例 (docker container)，这个实例会被包含在称为 <strong>Pod</strong> 的概念中，<strong>Pod</strong> 是 k8s 中最小可管理单元。</p><p>在 k8s 集群中发布 Deployment 后，Deployment 将指示 k8s 如何创建和更新应用程序的实例，master 节点将应用程序实例调度到集群中的具体的节点上。</p><p>创建应用程序实例后，Kubernetes Deployment Controller 会持续监控这些实例。如果运行实例的 worker 节点关机或被删除，则 Kubernetes Deployment Controller 将在群集中资源最优的另一个 worker 节点上重新创建一个新的实例。<strong>这提供了一种自我修复机制来解决机器故障或维护问题。</strong></p><p>​    通过创建应用程序实例并确保它们在集群节点中的运行实例个数，Kubernetes Deployment 提供了一种完全不同的方式来管理应用程序。</p><p> <img src="https://kuboard.cn/assets/img/module_02_first_app.25e902c4.svg" alt="Kubernetes教程：部署第一个应用程序"> </p><p> Deployment 处于 master 节点上，通过发布 Deployment，master 节点会选择合适的 worker 节点创建 Container（即图中的正方体），Container 会被包含在 Pod （即蓝色圆圈）里。 </p><h2 id="部署-nginx-Deployment"><a href="#部署-nginx-Deployment" class="headerlink" title="部署 nginx Deployment"></a>部署 nginx Deployment</h2><h6 id="创建文件-nginx-deployment-yaml"><a href="#创建文件-nginx-deployment-yaml" class="headerlink" title="创建文件 nginx-deployment.yaml"></a>创建文件 nginx-deployment.yaml</h6><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span><span class="comment">#与k8s集群版本有关，使用 kubectl api-versions 即可查看当前集群支持的版本</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span><span class="comment">#该配置的类型，我们使用的是 Deployment</span></span><br><span class="line"><span class="attr">metadata:</span>        <span class="comment">#译名为元数据，即 Deployment 的一些基本属性和信息</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-deployment</span><span class="comment">#Deployment 的名称</span></span><br><span class="line">  <span class="attr">labels:</span>    <span class="comment">#标签，可以灵活定位一个或多个资源，其中key和value均可自定义，可以定义多组，目前不需要理解</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">nginx</span><span class="comment">#为该Deployment设置key为app，value为nginx的标签</span></span><br><span class="line"><span class="attr">spec:</span>        <span class="comment">#这是关于该Deployment的描述，可以理解为你期待该Deployment在k8s中如何使用</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">1</span><span class="comment">#使用该Deployment创建一个应用程序实例</span></span><br><span class="line">  <span class="attr">selector:</span>    <span class="comment">#标签选择器，与上面的标签共同作用，目前不需要理解</span></span><br><span class="line">    <span class="attr">matchLabels:</span> <span class="comment">#选择包含标签app:nginx的资源</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line">  <span class="attr">template:</span>    <span class="comment">#这是选择或创建的Pod的模板</span></span><br><span class="line">    <span class="attr">metadata:</span><span class="comment">#Pod的元数据</span></span><br><span class="line">      <span class="attr">labels:</span><span class="comment">#Pod的标签，上面的selector即选择包含标签app:nginx的Pod</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line">    <span class="attr">spec:</span>    <span class="comment">#期望Pod实现的功能（即在pod中部署）</span></span><br><span class="line">      <span class="attr">containers:</span><span class="comment">#生成container，与docker中的container是同一种</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span><span class="comment">#container的名称</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">nginx:1.7.9</span><span class="comment">#使用镜像nginx:1.7.9创建container，该container默认80端口可访问</span></span><br></pre></td></tr></table></figure><h6 id="应用-YAML-文件"><a href="#应用-YAML-文件" class="headerlink" title="应用 YAML 文件"></a><strong>应用 YAML 文件</strong></h6><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f nginx-deployment.yaml</span><br></pre></td></tr></table></figure><h6 id="查看部署结果"><a href="#查看部署结果" class="headerlink" title="查看部署结果"></a><strong>查看部署结果</strong></h6><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看 Deployment</span></span><br><span class="line">kubectl get deployments</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看 Pod</span></span><br><span class="line">kubectl get pods</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt; 使用 kubectl 在 k8s 上部署第一个应用程序。 &lt;/p&gt;
+&lt;h2 id=&quot;Deployment概念&quot;&gt;&lt;a href=&quot;#Deployment概念&quot; class=&quot;headerlink&quot; title=&quot;Deployment概念&quot;&gt;&lt;/a&gt;Deployment概念&lt;/h2&gt;
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="http://yoursite.com/categories/kubernetes/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>kubectl 命令技巧大全</title>
