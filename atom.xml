@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-26T08:15:43.304Z</updated>
+  <updated>2020-03-26T08:44:37.348Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>k8s进阶-架构-集群内的通信</title>
+    <link href="http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84-%E9%9B%86%E7%BE%A4%E5%86%85%E7%9A%84%E9%80%9A%E4%BF%A1/"/>
+    <id>http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84-%E9%9B%86%E7%BE%A4%E5%86%85%E7%9A%84%E9%80%9A%E4%BF%A1/</id>
+    <published>2020-03-26T08:24:42.000Z</published>
+    <updated>2020-03-26T08:44:37.348Z</updated>
+    
+    <content type="html"><![CDATA[<p> Master-Node之间的通信</p><a id="more"></a> <h1 id="Master-Node之间的通信"><a href="#Master-Node之间的通信" class="headerlink" title="Master-Node之间的通信"></a>Master-Node之间的通信</h1><p>Master-Node 之间的通信可以分为如下两类：</p><ul><li>Cluster to Master</li><li>Master to Cluster</li></ul><h2 id="Cluster-to-Master"><a href="#Cluster-to-Master" class="headerlink" title="Cluster to Master"></a>Cluster to Master</h2><p>所有从集群访问 Master 节点的通信，都是针对 apiserver 的（没有任何其他 master 组件发布远程调用接口）。通常安装 Kubernetes 时，apiserver 监听 HTTPS 端口（443），并且配置了一种或多种客户端认证方式 authentication。至少需要配置一种形式的授权方式 authorization，尤其是匿名访问 anonymous requests或 Service Account Tokens被启用的情况下。</p><p>节点上必须配置集群（apiserver）的公钥根证书（public root certificate），此时，在提供有效的客户端身份认证的情况下，节点可以安全地访问 APIServer。例如，在 Google Kubernetes Engine 的一个默认 Kubernetes 安装里，通过客户端证书为 kubelet 提供客户端身份认证。</p><p>对于需要调用 APIServer 接口的 Pod，应该为其关联 Service Account，此时，Kubernetes将在创建Pod时自动为其注入公钥根证书（public root certificate）以及一个有效的 bearer token（放在HTTP请求头Authorization字段）。所有名称空间中，都默认配置了名为 <code>kubernetes</code> Kubernetes Service，该 Service对应一个虚拟 IP（默认为 10.96.0.1），发送到该地址的请求将由 kube-proxy 转发到 apiserver 的 HTTPS 端口上。</p><p>默认情况下，从集群（节点以及节点上运行的 Pod）访问 master 的连接是安全的，因此，可以通过不受信的网络或公网连接 Kubernetes 集群</p><h2 id="Master-to-Cluster"><a href="#Master-to-Cluster" class="headerlink" title="Master to Cluster"></a>Master to Cluster</h2><p>从 master（apiserver）到Cluster存在着两条主要的通信路径：</p><ul><li>apiserver 访问集群中每个节点上的 kubelet 进程</li><li>使用 apiserver 的 proxy 功能，从 apiserver 访问集群中的任意节点、Pod、Service</li></ul><h3 id="apiserver-to-kubelet"><a href="#apiserver-to-kubelet" class="headerlink" title="apiserver to kubelet"></a>apiserver to kubelet</h3><p>apiserver 在如下情况下访问 kubelet：</p><ul><li>抓取 Pod 的日志</li><li>通过 <code>kubectl exec -it</code> 指令（或 kuboard 的终端界面）获得容器的命令行终端</li><li>提供 <code>kubectl port-forward</code> 功能</li></ul><p>这些连接的访问端点是 kubelet 的 HTTPS 端口。默认情况下，apiserver 不校验 kubelet 的 HTTPS 证书，这种情况下，连接可能会收到 man-in-the-middle 攻击，因此该连接如果在不受信网络或者公网上运行时，是 <strong>不安全</strong> 的。</p><p>如果要校验 kubelet 的 HTTPS 证书，可以通过 <code>--kubelet-certificate-authority</code> 参数为 apiserver 提供校验 kubelet 证书的根证书。</p><p>如果不能完成这个配置，又需要通过不受信网络或公网将节点加入集群，则需要使用SSH隧道连接 apiserver 和 kubelet。</p><p>同时，Kubelet authentication/authorization需要激活，以保护 kubelet API</p><h2 id="apiserver-to-nodes-pods-services"><a href="#apiserver-to-nodes-pods-services" class="headerlink" title="apiserver to nodes, pods, services"></a>apiserver to nodes, pods, services</h2><p>从 apiserver 到 节点/Pod/Service 的连接使用的是 HTTP 连接，没有进行身份认证，也没有进行加密传输。您也可以通过增加 <code>https</code> 作为 节点/Pod/Service 请求 URL 的前缀，但是 HTTPS 证书并不会被校验，也无需客户端身份认证，因此该连接是无法保证一致性的。目前，此类连接如果运行在非受信网络或公网上时，是 <strong>不安全</strong> 的</p><h2 id="SSH隧道"><a href="#SSH隧道" class="headerlink" title="SSH隧道"></a>SSH隧道</h2><p>Kubernetes 支持 SSH隧道（tunnel）来保护 Master –&gt; Cluster 访问路径。此时，apiserver 将向集群中的每一个节点建立一个 SSH隧道（连接到端口22的ssh服务）并通过隧道传递所有发向 kubelet、node、pod、service 的请求。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt; Master-Node之间的通信&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="http://yoursite.com/categories/kubernetes/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>k8s进阶-架构-节点</title>
