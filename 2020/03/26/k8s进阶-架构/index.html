@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="节点节点状态节点的状态包含如下信息：  Addresses Conditions Capacity and Allocatable Info  执行以下命令可查看所有节点的列表 1kubectl get nodes -o wide  执行以下命令可查看节点状态以及节点的其他详细信息：  1kubectl describe node &lt;your-node-name&gt;  Addre">
+<meta property="og:type" content="article">
+<meta property="og:title" content="k8s进阶-架构">
+<meta property="og:url" content="http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="拒绝再玩">
+<meta property="og:description" content="节点节点状态节点的状态包含如下信息：  Addresses Conditions Capacity and Allocatable Info  执行以下命令可查看所有节点的列表 1kubectl get nodes -o wide  执行以下命令可查看节点状态以及节点的其他详细信息：  1kubectl describe node &lt;your-node-name&gt;  Addre">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-26T02:21:12.000Z">
+<meta property="article:modified_time" content="2020-03-26T08:12:27.786Z">
+<meta property="article:author" content="duoyu">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>k8s进阶-架构 | 拒绝再玩</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="拒绝再玩" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">拒绝再玩</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          k8s进阶-架构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-26 10:21:12 / 修改时间：16:12:27" itemprop="dateCreated datePublished" datetime="2020-03-26T10:21:12+08:00">2020-03-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+         <a id="more"></a> 
+
+<h1 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h1><h2 id="节点状态"><a href="#节点状态" class="headerlink" title="节点状态"></a>节点状态</h2><p>节点的状态包含如下信息：</p>
+<ul>
+<li>Addresses</li>
+<li>Conditions</li>
+<li>Capacity and Allocatable</li>
+<li>Info</li>
+</ul>
+<p>执行以下命令可查看所有节点的列表</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl get nodes -o wide</span><br></pre></td></tr></table></figure>
+
+<p>执行以下命令可查看节点状态以及节点的其他详细信息： </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl describe node &lt;your-node-name&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Addresses"><a href="#Addresses" class="headerlink" title="Addresses"></a>Addresses</h3><ul>
+<li>HostName： 在节点命令行界面上执行 <code>hostname</code> 命令所获得的值。启动 kubelet 时，可以通过参数 <code>--hostname-override</code> 覆盖</li>
+<li>ExternalIP：通常是节点的外部IP（可以从集群外访问的内网IP地址；上面的例子中，此字段为空）</li>
+<li>InternalIP：通常是从节点内部可以访问的 IP 地址</li>
+</ul>
+<h3 id="Conditions"><a href="#Conditions" class="headerlink" title="Conditions"></a>Conditions</h3><p><code>Conditions</code> 描述了节点的状态。Condition的例子有：</p>
+<table>
+<thead>
+<tr>
+<th>Node Condition</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OutOfDisk</td>
+<td>如果节点上的空白磁盘空间不够，不能够再添加新的节点时，该字段为 <code>True</code>，其他情况为 <code>False</code></td>
+</tr>
+<tr>
+<td>Ready</td>
+<td>如果节点是健康的且已经就绪可以接受新的 Pod。则节点Ready字段为 <code>True</code>。<code>False</code>表明了该节点不健康，不能够接受新的 Pod。</td>
+</tr>
+<tr>
+<td>MemoryPressure</td>
+<td>如果节点内存紧张，则该字段为 <code>True</code>，否则为<code>False</code></td>
+</tr>
+<tr>
+<td>PIDPressure</td>
+<td>如果节点上进程过多，则该字段为 <code>True</code>，否则为 <code>False</code></td>
+</tr>
+<tr>
+<td>DiskPressure</td>
+<td>如果节点磁盘空间紧张，则该字段为 <code>True</code>，否则为 <code>False</code></td>
+</tr>
+<tr>
+<td>NetworkUnvailable</td>
+<td>如果节点的网络配置有问题，则该字段为 <code>True</code>，否则为 <code>False</code></td>
+</tr>
+</tbody></table>
+<h3 id="Capacity-and-Allocatable（容量和可分配量）"><a href="#Capacity-and-Allocatable（容量和可分配量）" class="headerlink" title="Capacity and Allocatable（容量和可分配量）"></a>Capacity and Allocatable（容量和可分配量）</h3><p>容量和可分配量（Capacity and Allocatable）描述了节点上的可用资源的情况：</p>
+<ul>
+<li>CPU</li>
+<li>内存</li>
+<li>该节点可调度的最大 pod 数量</li>
+</ul>
+<p>Capacity 中的字段表示节点上的资源总数，Allocatable 中的字段表示该节点上可分配给普通 Pod 的资源总数。</p>
+<h3 id="Info"><a href="#Info" class="headerlink" title="Info"></a>Info</h3><p>描述了节点的基本信息，例如：</p>
+<ul>
+<li>Linux 内核版本</li>
+<li>Kubernetes 版本（kubelet 和 kube-proxy 的版本）</li>
+<li>Docker 版本</li>
+<li>操作系统名称</li>
+</ul>
+<p>这些信息由节点上的 kubelet 收集。</p>
+<h1 id="节点管理"><a href="#节点管理" class="headerlink" title="节点管理"></a>节点管理</h1><p>与 Pod 和 Service 不一样，节点并不是由 Kubernetes 创建的，节点由云供应商（例如，Google Compute Engine、阿里云等）创建，或者节点已经存在于您的物理机/虚拟机的资源池。向 Kubernetes 中创建节点时，仅仅是创建了一个描述该节点的 API 对象。节点 API 对象创建成功后，Kubernetes将检查该节点是否有效。</p>
+<h2 id="节点控制器（Node-Controller）"><a href="#节点控制器（Node-Controller）" class="headerlink" title="节点控制器（Node Controller）"></a>节点控制器（Node Controller）</h2><p>节点控制器是一个负责管理节点的 Kubernetes master 组件。在节点的生命周期中，节点控制器起到了许多作用。</p>
+<ol>
+<li>节点控制器在注册节点时为节点分配 CIDR 地址块</li>
+<li>节点控制器通过云供应商（cloud-controller-manager）接口检查节点列表中每一个节点对象对应的虚拟机是否可用。在云环境中，只要节点状态异常，节点控制器检查其虚拟机在云供应商的状态，如果虚拟机不可用，自动将节点对象从 APIServer 中删除。</li>
+<li>节点控制器监控节点的健康状况。当节点变得不可触达时（例如，由于节点已停机，节点控制器不再收到来自节点的心跳信号），节点控制器将节点API对象的 <code>NodeStatus</code> Condition 取值从 <code>NodeReady</code> 更新为 <code>Unknown</code>；然后在等待 <code>pod-eviction-timeout</code> 时间后，将节点上的所有 Pod 从节点驱逐。 </li>
+</ol>
+<blockquote>
+<ul>
+<li>默认40秒未收到心跳，修改 <code>NodeStatus</code> Condition 为 <code>Unknown</code>；</li>
+<li>默认 <code>pod-eviction-timeout</code> 为 5分钟</li>
+<li>节点控制器每隔 <code>--node-monitor-period</code> 秒检查一次节点的状态</li>
+</ul>
+</blockquote>
+<h2 id="节点自注册（Self-Registration）"><a href="#节点自注册（Self-Registration）" class="headerlink" title="节点自注册（Self-Registration）"></a>节点自注册（Self-Registration）</h2><p>如果 kubelet 的启动参数 <code>--register-node</code>为 true（默认为 true），kubelet 会尝试将自己注册到 API Server。kubelet自行注册时，将使用如下选项：</p>
+<ul>
+<li><code>--kubeconfig</code>：向 apiserver 进行认证时所用身份信息的路径</li>
+<li><code>--cloud-provider</code>：向云供应商读取节点自身元数据</li>
+<li><code>--register-node</code>：自动向 API Server 注册节点</li>
+<li><code>--register-with-taints</code>：注册节点时，为节点添加污点（逗号分隔，格式为 <key>=<value>:<effect></li>
+<li><code>--node-ip</code>：节点的 IP 地址</li>
+<li><code>--node-labels</code>：注册节点时，为节点添加标签</li>
+<li><code>--node-status-update-frequency</code>：向 master 节点发送心跳信息的时间间隔</li>
+</ul>
+<p>如果 Node authorization mode 和 NodeRestriction admission plugin 被启用，kubelet 只拥有创建/修改其自身所对应的节点 API 对象的权限。</p>
+<h2 id="手动管理节点"><a href="#手动管理节点" class="headerlink" title="手动管理节点"></a>手动管理节点</h2><p>如果想要手工创建节点API对象，可以将 kubelet 的启动参数 <code>--register-node</code> 设置为 false。</p>
+<p>管理员可以修改节点API对象（不管是否设置了 <code>--register-node</code> 参数）。可以修改的内容有：</p>
+<ul>
+<li>增加/减少标签</li>
+<li>标记节点为不可调度（unschedulable）</li>
+</ul>
+<p>节点的标签与 Pod 上的节点选择器（node selector）配合，可以控制调度方式，例如，限定 Pod 只能在某一组节点上运行。</p>
+<p>执行如下命令可将节点标记为不可调度（unschedulable），此时将阻止新的 Pod 被调度到该节点上，但是不影响任何已经在该节点上运行的 Pod。这在准备重启节点之前非常有用。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">kubectl</span> <span class="string">cordon</span> <span class="string">$NODENAME</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="节点容量（Node-Capacity）"><a href="#节点容量（Node-Capacity）" class="headerlink" title="节点容量（Node Capacity）"></a>节点容量（Node Capacity）</h2><p>Kubernetes 调度器在调度 Pod 到节点上时，将确保节点上有足够的资源。具体来说，调度器检查节点上所有容器的资源请求之和不大于节点的容量。此时，只能检查由 kubelet 启动的容器，不包括直接由容器引擎启动的容器，更不包括不在容器里运行的进程</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/25/%E4%BC%B8%E7%BC%A9%E6%9C%8D%E5%8A%A1/" rel="prev" title="伸缩服务和滚动更新">
+      <i class="fa fa-chevron-left"></i> 伸缩服务和滚动更新
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#节点"><span class="nav-number">1.</span> <span class="nav-text">节点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#节点状态"><span class="nav-number">1.1.</span> <span class="nav-text">节点状态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Addresses"><span class="nav-number">1.1.1.</span> <span class="nav-text">Addresses</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Conditions"><span class="nav-number">1.1.2.</span> <span class="nav-text">Conditions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Capacity-and-Allocatable（容量和可分配量）"><span class="nav-number">1.1.3.</span> <span class="nav-text">Capacity and Allocatable（容量和可分配量）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Info"><span class="nav-number">1.1.4.</span> <span class="nav-text">Info</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#节点管理"><span class="nav-number">2.</span> <span class="nav-text">节点管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#节点控制器（Node-Controller）"><span class="nav-number">2.1.</span> <span class="nav-text">节点控制器（Node Controller）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#节点自注册（Self-Registration）"><span class="nav-number">2.2.</span> <span class="nav-text">节点自注册（Self-Registration）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#手动管理节点"><span class="nav-number">2.3.</span> <span class="nav-text">手动管理节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#节点容量（Node-Capacity）"><span class="nav-number">2.4.</span> <span class="nav-text">节点容量（Node Capacity）</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">duoyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">duoyu</span>
+</div>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
