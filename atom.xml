@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-03-26T08:44:37.348Z</updated>
+  <updated>2020-03-26T09:17:26.418Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>k8s进阶-架构-控制器</title>
+    <link href="http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84-%E6%8E%A7%E5%88%B6%E5%99%A8/"/>
+    <id>http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84-%E6%8E%A7%E5%88%B6%E5%99%A8/</id>
+    <published>2020-03-26T08:49:58.000Z</published>
+    <updated>2020-03-26T09:17:26.418Z</updated>
+    
+    <content type="html"><![CDATA[<p>控制器不断地尝试着将当前的状态调整到目标状态</p> <a id="more"></a> <h1 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h1><p>在 Kubernetes 中，<strong>控制器</strong> 就是上面所说的 <strong>控制循环</strong>，它不断监控着集群的状态，并对集群做出对应的变更调整。每一个控制器都不断地尝试着将 <strong><em>当前状态</em></strong> 调整到 <strong><em>目标状态</em></strong>。 </p><h2 id="控制器模式"><a href="#控制器模式" class="headerlink" title="控制器模式"></a>控制器模式</h2><p>在 Kubernetes 中，每个控制器至少追踪一种类型的资源。这些资源对象中有一个 <code>spec</code> 字段代表了目标状态。资源对象对应的控制器负责不断地将当前状态调整到目标状态。</p><p>理论上，控制器可以自己直接执行调整动作，然而，在Kubernetes 中，更普遍的做法是，控制器发送消息到 API Server，而不是直接自己执行调整动作。</p><h3 id="通过APIServer进行控制"><a href="#通过APIServer进行控制" class="headerlink" title="通过APIServer进行控制"></a>通过APIServer进行控制</h3><p>以 Kubernetes 中自带的一个控制器 Job Controller 为例。Kubernetes 自带的控制器都是通过与集群中 API Server 交互来达到调整状态的目的。</p><p>Job 是一种 Kubernetes API 对象，一个 Job 将运行一个（或多个）Pod，执行一项任务，然后停止。当新的 Job 对象被创建时，Job Controller 将确保集群中有合适数量的节点上的 kubelet 启动了指定个数的 Pod，以完成 Job 的执行任务。Job Controller 自己并不执行任何 Pod 或容器，而是发消息给 API Server，由其他的控制组件配合 API Server，以执行创建或删除 Pod 的实际动作。</p><p>当新的 Job 对象被创建时，目标状态是指定的任务被执行完成。Job Controller 调整集群的当前状态以达到目标状态：创建 Pod 以执行 Job 中指定的任务</p><p>控制器同样也会更新其关注的 API 对象。例如：一旦 Job 的任务执行结束，Job Controller 将更新 Job 的 API 对象，将其标注为 <code>Finished</code>。</p><h3 id="直接控制"><a href="#直接控制" class="headerlink" title="直接控制"></a>直接控制</h3><p>某些特殊的控制器需要对集群外部的东西做调整。例如，想用一个控制器确保集群中有足够的节点，此时控制器需要调用云供应商的接口以创建新的节点或移除旧的节点。这类控制器将从 API Server 中读取关于目标状态的信息，并直接调用外部接口以实现调整目标。</p><h2 id="目标状态-vs-当前状态"><a href="#目标状态-vs-当前状态" class="headerlink" title="目标状态 vs 当前状态"></a>目标状态 vs 当前状态</h2><p>Kubernetes 使用了 <code>云原生</code>（cloud-native）的视角来看待系统，并且可以持续应对变化。集群在运行的过程中，任何时候都有可能发生突发事件，而控制器则自动地修正这些问题。这就意味着，集群永远不会达到一个稳定不变的状态。</p><p>这种通过控制器监控集群状态并利用负反馈原理不断接近目标状态的系统，相较于那种完成安装后就不再改变的系统，是一种更高级的系统形态。</p><h2 id="运行控制器的方式"><a href="#运行控制器的方式" class="headerlink" title="运行控制器的方式"></a>运行控制器的方式</h2><p>Kubernetes 在 kube-controller-manager 中运行了大量的内建控制器（例如，Deployment Controller、Job Controller、StatefulSet Controller、DaemonSet Controller 等）。这些内建控制器提供了 Kubernetes 非常重要的核心功能。Kubernetes 可以运行一个 master 集群，以实现内建控制器的高可用。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;控制器不断地尝试着将当前的状态调整到目标状态&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="http://yoursite.com/categories/kubernetes/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>k8s进阶-架构-集群内的通信</title>
