@@ -2,23 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84-%E6%8E%A7%E5%88%B6%E5%99%A8/</loc>
+    <loc>http://yoursite.com/2020/03/27/kubeadm%E5%AE%89%E8%A3%85Kubernetes1-16-3/</loc>
     
-    <lastmod>2020-03-26T09:17:26.418Z</lastmod>
+    <lastmod>2020-03-27T07:20:55.566Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84-%E9%9B%86%E7%BE%A4%E5%86%85%E7%9A%84%E9%80%9A%E4%BF%A1/</loc>
     
-    <lastmod>2020-03-26T08:44:37.348Z</lastmod>
+    <lastmod>2020-03-27T07:20:32.525Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84/</loc>
     
-    <lastmod>2020-03-26T08:15:43.304Z</lastmod>
+    <lastmod>2020-03-26T09:17:36.969Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84-%E6%8E%A7%E5%88%B6%E5%99%A8/</loc>
+    
+    <lastmod>2020-03-26T09:17:26.418Z</lastmod>
     
   </url>
   
