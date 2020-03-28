@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Kubernetes中容器的相关">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" Kubernetes容器">
+<meta property="og:url" content="http://yoursite.com/2020/03/28/Kubernetes%E5%AE%B9%E5%99%A8/index.html">
+<meta property="og:site_name" content="拒绝再玩">
+<meta property="og:description" content="Kubernetes中容器的相关">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-28T06:58:54.000Z">
+<meta property="article:modified_time" content="2020-03-28T07:35:24.859Z">
+<meta property="article:author" content="duoyu">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/28/Kubernetes%E5%AE%B9%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> Kubernetes容器 | 拒绝再玩</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="拒绝再玩" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">拒绝再玩</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/28/Kubernetes%E5%AE%B9%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+           Kubernetes容器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-28 14:58:54 / 修改时间：15:35:24" itemprop="dateCreated datePublished" datetime="2020-03-28T14:58:54+08:00">2020-03-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p> Kubernetes中容器的相关</p>
+<a id="more"></a> 
+
+<h1 id="一、容器"><a href="#一、容器" class="headerlink" title="一、容器"></a>一、容器</h1><h2 id="容器镜像"><a href="#容器镜像" class="headerlink" title="容器镜像"></a>容器镜像</h2><p>在 Kubernetes 的 Pod 中使用容器镜像之前，您必须将其推送到一个镜像仓库（或者使用仓库中已经有的容器镜像）。在 Kubernetes 的 Pod 定义中定义容器时，必须指定容器所使用的镜像，容器中的 <code>image</code> 字段支持与 <code>docker</code> 命令一样的语法，包括私有镜像仓库和标签。</p>
+<p>例如：<code>my-registry.example.com:5000/example/web-example:v1.0.1</code> 由如下几个部分组成：</p>
+<p>my-registry.example.com:5000/example/web-example:v1.0.1</p>
+<ul>
+<li>my-registry.example.com：registry 地址</li>
+<li>:5000：registry 端口</li>
+<li>example：repository 名字</li>
+<li>web-example：image 名字</li>
+<li>v1.0.1：image 标签</li>
+</ul>
+<p>如果使用 <code>hub.dokcer.com</code> Registry 中的镜像，可以省略 registry 地址和 registry 端口。</p>
+<p>例如：<code>nginx:latest</code>，<code>eipwork/kuboard</code></p>
+<h3 id="更新镜像"><a href="#更新镜像" class="headerlink" title="更新镜像"></a>更新镜像</h3><p>Kubernetes中，默认的镜像抓取策略是 <code>IfNotPresent</code>，使用此策略，kubelet在发现本机有镜像的情况下，不会向镜像仓库抓取镜像。如果想每次启动 Pod 时，都强制从镜像仓库抓取镜像，可以尝试如下方式：</p>
+<ul>
+<li>设置 container 中的 <code>imagePullPolicy</code> 为 <code>Always</code></li>
+<li>省略 <code>imagePullPolicy</code> 字段，并使用 <code>:latest</code> tag 的镜像</li>
+<li>省略 <code>imagePullPolicy</code> 字段和镜像的 tag</li>
+<li>激活 AlwaysPullImages 管理控制器</li>
+</ul>
+<p>imagePullPolicy 字段和 image tag的可能取值将影响到 kubelet 如何抓取镜像：</p>
+<ul>
+<li><code>imagePullPolicy: IfNotPresent</code> 仅在节点上没有该镜像时，从镜像仓库抓取</li>
+<li><code>imagePullPolicy: Always</code> 每次启动 Pod 时，从镜像仓库抓取</li>
+<li><code>imagePullPolicy</code> 未填写，镜像 tag 为 <code>:latest</code> 或者未填写，则同 <code>Always</code> 每次启动 Pod 时，从镜像仓库抓取</li>
+<li><code>imagePullPolicy</code> 未填写，镜像 tag 已填写但不是 <code>:latest</code>，则同 <code>IfNotPresent</code> 仅在节点上没有该镜像时，从镜像仓库抓取</li>
+<li><code>imagePullPolicy: Never</code>，Kubernetes 假设本地存在该镜像，并且不会尝试从镜像仓库抓取镜像</li>
+</ul>
+<h1 id="二、容器的环境变量"><a href="#二、容器的环境变量" class="headerlink" title="二、容器的环境变量"></a>二、容器的环境变量</h1><p>Kubernetes为容器提供了一系列重要的资源：</p>
+<ul>
+<li>由镜像、一个或多个数据卷合并组成的文件系统</li>
+<li>容器自身的信息</li>
+<li>集群中其他重要对象的信息</li>
+</ul>
+<h2 id="集群的信息"><a href="#集群的信息" class="headerlink" title="集群的信息"></a>集群的信息</h2><p>在容器创建时，集群中所有的 Service 的连接信息将以环境变量的形式注入到容器中。例如，已创建了一个名为 <code>Foo</code> 的 Service，此时再创建任何容器时，该容器将包含如下环境变量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FOO_SERVICE_HOST &#x3D; &lt;Service的ClusterIP&gt;</span><br><span class="line">FOO_SERVICE_PORT &#x3D; &lt;Service的端口&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、容器生命周期"><a href="#三、容器生命周期" class="headerlink" title="三、容器生命周期"></a>三、容器生命周期</h1><h2 id="容器钩子"><a href="#容器钩子" class="headerlink" title="容器钩子"></a>容器钩子</h2><p>Kubernetes中为容器提供了两个 hook（钩子函数）：</p>
+<ul>
+<li><p><code>PostStart</code></p>
+<p>此钩子函数在容器创建后将立刻执行。但是，并不能保证该钩子函数在容器的 <code>ENTRYPOINT</code> 之前执行。该钩子函数没有输入参数。</p>
+</li>
+<li><p><code>PreStop</code></p>
+<p>此钩子函数在容器被 terminate（终止）之前执行，例如：</p>
+<ul>
+<li>通过接口调用删除容器所在 Pod</li>
+<li>某些管理事件的发生：健康检查失败、资源紧缺等</li>
+</ul>
+<p>如果容器已经被关闭或者进入了 <code>completed</code> 状态，preStop 钩子函数的调用将失败。该函数的执行是同步的，即，kubernetes 将在该函数完成执行之后才删除容器。该钩子函数没有输入参数。</p>
+<h3 id="Hook-handler的实现"><a href="#Hook-handler的实现" class="headerlink" title="Hook handler的实现"></a>Hook handler的实现</h3><p>容器只要实现并注册 hook handler 便可以使用钩子函数。Kubernetes 中，容器可以实现两种类型的 hook handler：</p>
+<ul>
+<li>Exec - 在容器的名称空进和 cgroups 中执行一个指定的命令，例如 <code>pre-stop.sh</code>。该命令所消耗的 CPU、内存等资源，将计入容器可以使用的资源限制。</li>
+<li>HTTP - 向容器的指定端口发送一个 HTTP 请求</li>
+</ul>
+<h3 id="Hook-handler的执行"><a href="#Hook-handler的执行" class="headerlink" title="Hook handler的执行"></a>Hook handler的执行</h3><p>当容器的生命周期事件发生时，Kubernetes 在容器中执行该钩子函数注册的 handler。</p>
+<p>对于 Pod 而言，hook handler 的调用是同步的。即，如果是 <code>PostStart</code> hook，容器的 <code>ENTRYPOINT</code> 和 hook 是同时出发的，然而如果 hook 执行的时间过长或者挂起了，容器将不能进入到 <code>Running</code> 状态。</p>
+<p><code>PreStop</code> hook 的行为与此相似。如果 hook 在执行过程中挂起了，Pod phase 将停留在 <code>Terminating</code> 的状态，并且在 <code>terminationGracePeriodSeconds</code> 超时之后，Pod被删除。如果 <code>PostStart</code> 或者 <code>PreStop</code> hook 执行失败，则 Kubernetes 将 kill（杀掉）该容器。</p>
+<p>用户应该使其 hook handler 越轻量级越好。例如，对于长时间运行的任务，在停止容器前，调用 <code>PreStop</code> 钩子函数，以保存当时的计算状态和数据。</p>
+<h3 id="Hook触发的保证"><a href="#Hook触发的保证" class="headerlink" title="Hook触发的保证"></a>Hook触发的保证</h3><p>Hook 将至少被触发一次，即，当指定事件 <code>PostStart</code> 或 <code>PreStop</code> 发生时，hook 有可能被多次触发。hook handler 的实现需要保证即使多次触发，执行也不会出错。</p>
+<p>通常来说，hook 实际值被触发一次。例如：如果 HTTP hook 的服务端已经停机，或者因为网络的问题不能接收到请求，请求将不会被再次发送。在极少数的情况下， 触发两次 hook 的事情会发生。例如，如果 kueblet 在触发 hook 的过程中重启了，该 hook 将在 Kubelet 重启后被再次触发。</p>
+<h3 id="调试-hook-handler"><a href="#调试-hook-handler" class="headerlink" title="调试 hook handler"></a>调试 hook handler</h3><p>Hook handler 的日志并没有在 Pod 的 events 中发布。如果 handler 因为某些原因失败了，kubernetes 将广播一个事件 <code>PostStart</code> hook 发送 <code>FailedPreStopHook</code> 事件。 可以执行命令 <code>kubectl describe pod $(pod_name)</code> 以查看这些事件。</p>
+</li>
+</ul>
+<h1 id="四、容器生命周期事件处理"><a href="#四、容器生命周期事件处理" class="headerlink" title="四、容器生命周期事件处理"></a>四、容器生命周期事件处理</h1><p>Kubernetes 中支持容器的 postStart 和 preStop 事件，本文阐述了如何向容器添加生命周期事件处理程序（handler）。</p>
+<ul>
+<li><code>postStart</code> 容器启动时，Kubernetes 立刻发送 postStart 事件，但不确保对应的 handler 是否能在容器的 <code>EntryPoint</code> 之前执行</li>
+<li><code>preStop</code> 容器停止前，Kubernetes 发送 preStop 事件</li>
+</ul>
+<h2 id="定义postStart和preStop处理程序"><a href="#定义postStart和preStop处理程序" class="headerlink" title="定义postStart和preStop处理程序"></a>定义postStart和preStop处理程序</h2><p>创建一个包含单一容器的 Pod，并为该容器关联 postStart 和 preStop 处理程序（handler）。Pod 的yaml文件定义如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">lifecycle-demo</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">lifecycle-demo-container</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">nginx</span></span><br><span class="line">    <span class="attr">lifecycle:</span></span><br><span class="line">      <span class="attr">postStart:</span></span><br><span class="line">        <span class="attr">exec:</span></span><br><span class="line">          <span class="attr">command:</span> <span class="string">["/bin/sh",</span> <span class="string">"-c"</span><span class="string">,</span> <span class="string">"echo Hello from the postStart handler &gt; /usr/share/message"</span><span class="string">]</span></span><br><span class="line">      <span class="attr">preStop:</span></span><br><span class="line">        <span class="attr">exec:</span></span><br><span class="line">          <span class="attr">command:</span> <span class="string">["/bin/sh","-c","nginx</span> <span class="string">-s</span> <span class="string">quit;</span> <span class="string">while</span> <span class="string">killall</span> <span class="number">-0</span> <span class="string">nginx;</span> <span class="string">do</span> <span class="string">sleep</span> <span class="number">1</span><span class="string">;</span> <span class="string">done"]</span></span><br></pre></td></tr></table></figure>
+
+<p>在该例子中，请注意：</p>
+<ul>
+<li>postStart 命令向 <code>usr/share/message</code> 文件写入了一行文字</li>
+<li>preStop 命令优雅地关闭了 nginx</li>
+</ul>
+<blockquote>
+<p>如果容器碰到问题，被 Kubernetes 关闭，这个操作是非常有帮助的，可以使得您的程序在关闭前执行必要的清理任务</p>
+</blockquote>
+<ul>
+<li>创建pod</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master k8s-yamls]<span class="comment"># kubectl apply -f lifecycle-demo.yaml </span></span><br><span class="line">pod/lifecycle-demo created</span><br><span class="line">[root@k8s-master k8s-yamls]<span class="comment"># kubectl get pod -A</span></span><br><span class="line">NAMESPACE     NAME                                          READY   STATUS    RESTARTS   AGE</span><br><span class="line">default       lifecycle-demo                                1/1     Running   0          50s</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>进入容器的命令行终端： </li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master k8s-yamls]<span class="comment"># kubectl exec -it lifecycle-demo -- /bin/bash</span></span><br><span class="line">root@lifecycle-demo:/<span class="comment"># cat /usr/share/message</span></span><br><span class="line">Hello from the postStart handler</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Kubernetes 在容器启动后立刻发送 postStart 事件，但是并不能确保 postStart 事件处理程序在容器的 EntryPoint 之前执行。</p>
+<p>postStart 事件处理程序相对于容器中的进程来说是异步的（同时执行），然而，Kubernetes 在管理容器时，将一直等到 postStart 事件处理程序结束之后，才会将容器的状态标记为 Running。</p>
+<p>Kubernetes 在决定关闭容器时，立刻发送 preStop 事件，并且，将一直等到 preStop 事件处理程序结束或者 Pod 的 <code>--grace-period</code> 超时，才删除容器。</p>
+<p>注意： Kubernetes 只在 Pod <code>Teminated</code> 状态时才发送 preStop 事件，这意味着，如果 Pod 已经进入了 <code>Completed</code> 状态， preStop 事件处理程序将不会被调用 </p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/28/k8s%E6%A0%87%E7%AD%BE%E5%92%8C%E9%80%89%E6%8B%A9%E5%99%A8/" rel="prev" title="k8s标签和选择器">
+      <i class="fa fa-chevron-left"></i> k8s标签和选择器
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、容器"><span class="nav-number">1.</span> <span class="nav-text">一、容器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#容器镜像"><span class="nav-number">1.1.</span> <span class="nav-text">容器镜像</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更新镜像"><span class="nav-number">1.1.1.</span> <span class="nav-text">更新镜像</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、容器的环境变量"><span class="nav-number">2.</span> <span class="nav-text">二、容器的环境变量</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#集群的信息"><span class="nav-number">2.1.</span> <span class="nav-text">集群的信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、容器生命周期"><span class="nav-number">3.</span> <span class="nav-text">三、容器生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#容器钩子"><span class="nav-number">3.1.</span> <span class="nav-text">容器钩子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hook-handler的实现"><span class="nav-number">3.1.1.</span> <span class="nav-text">Hook handler的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hook-handler的执行"><span class="nav-number">3.1.2.</span> <span class="nav-text">Hook handler的执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hook触发的保证"><span class="nav-number">3.1.3.</span> <span class="nav-text">Hook触发的保证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调试-hook-handler"><span class="nav-number">3.1.4.</span> <span class="nav-text">调试 hook handler</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、容器生命周期事件处理"><span class="nav-number">4.</span> <span class="nav-text">四、容器生命周期事件处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义postStart和preStop处理程序"><span class="nav-number">4.1.</span> <span class="nav-text">定义postStart和preStop处理程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.2.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">duoyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">duoyu</span>
+</div>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
