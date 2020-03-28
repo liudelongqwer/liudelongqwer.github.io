@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Kubernetes对象及管理，名称（name），名称空间（namespace）的概念">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作Kubernetes">
+<meta property="og:url" content="http://yoursite.com/2020/03/28/%E6%93%8D%E4%BD%9CKubernetes/index.html">
+<meta property="og:site_name" content="拒绝再玩">
+<meta property="og:description" content="Kubernetes对象及管理，名称（name），名称空间（namespace）的概念">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-28T02:24:30.000Z">
+<meta property="article:modified_time" content="2020-03-28T03:48:07.794Z">
+<meta property="article:author" content="duoyu">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/28/%E6%93%8D%E4%BD%9CKubernetes/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>操作Kubernetes | 拒绝再玩</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="拒绝再玩" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">拒绝再玩</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/28/%E6%93%8D%E4%BD%9CKubernetes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作Kubernetes
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-03-28 10:24:30 / 修改时间：11:48:07" itemprop="dateCreated datePublished" datetime="2020-03-28T10:24:30+08:00">2020-03-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p> Kubernetes对象及管理，名称（name），名称空间（namespace）的概念</p>
+<a id="more"></a> 
+
+<h1 id="1、什么是Kubernetes对象"><a href="#1、什么是Kubernetes对象" class="headerlink" title="1、什么是Kubernetes对象"></a>1、什么是Kubernetes对象</h1><p>​    Kubernetes对象指的是Kubernetes系统的持久化实体，所有这些对象合起来，代表了集群的实际情况。常规的应用里，应用程序的数据存储在数据库中，Kubernetes将其数据以Kubernetes对象的形式通过 api server存储在 etcd 中。具体来说，这些数据（Kubernetes对象）描述了：</p>
+<ul>
+<li>集群中运行了哪些容器化应用程序（以及在哪个节点上运行）</li>
+<li>集群中对应用程序可用的资源</li>
+<li>应用程序相关的策略定义，例如，重启策略、升级策略、容错策略</li>
+<li>其他Kubernetes管理应用程序时所需要的信息</li>
+</ul>
+<p>操作 Kubernetes 对象（创建、修改、删除）的方法主要有：</p>
+<ul>
+<li>kubectl 命令行工具</li>
+<li>kuboard 图形界面工具</li>
+</ul>
+<p>kubectl、kuboard 最终都通过调用 kubernetes API 来实现对 Kubernetes 对象的操作。 </p>
+<h2 id="对象的spec和status"><a href="#对象的spec和status" class="headerlink" title="对象的spec和status"></a>对象的spec和status</h2><p>每一个 Kubernetes 对象都包含了两个重要的字段：</p>
+<ul>
+<li><code>spec</code> 必须由您来提供，描述了您对该对象所期望的 <strong>目标状态</strong></li>
+<li><code>status</code> 只能由 Kubernetes 系统来修改，描述了该对象在 Kubernetes 系统中的 <strong>实际状态</strong></li>
+</ul>
+<p>Kubernetes通过对应的控制器，不断地使实际状态趋向于期望的目标状态。</p>
+<p>​        例如，一个 Kubernetes Deployment 对象可以代表一个应用程序在集群中的运行状态。当创建 Deployment 对象时，可以通过 Deployment 的 spec 字段指定需要运行应用程序副本数（假设为3）。Kubernetes 从 Deployment 的 spec 中读取这些信息，并创建指定容器化应用程序的 3 个副本，再将实际的状态更新到 Deployment 的 status 字段。Kubernetes 系统将不断地比较 <strong>实际状态</strong> staus 和 <strong>目标状态</strong> spec 之间的差异，并根据差异做出对应的调整。例如，如果任何一个副本运行失败了，Kubernetes 将启动一个新的副本，以替代失败的副本</p>
+<h2 id="描述Kubernetes对象"><a href="#描述Kubernetes对象" class="headerlink" title="描述Kubernetes对象"></a>描述Kubernetes对象</h2><p>在 Kubernetes 中创建一个对象时，必须提供</p>
+<ul>
+<li>该对象的 spec 字段，通过该字段描述您期望的 <strong>目标状态</strong></li>
+<li>该对象的一些基本信息，例如名字</li>
+</ul>
+<p>如果使用 kubectl 创建对象，必须编写 <code>.yaml</code> 格式的文件下面是一个 kubectl 可以使用的 <code>.yaml</code> 文件：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-deployment</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">2</span> <span class="comment"># 运行 2 个容器化应用程序副本</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">nginx:1.7.9</span></span><br><span class="line">        <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+
+<p> 使用 kube apply 命令可以创建该 <code>.yaml</code> 文件中的 Deployment 对象： </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master k8s-yamls]<span class="comment"># kubectl apply -f nginx-deployment.yaml </span></span><br><span class="line">deployment.apps/nginx-deployment created</span><br><span class="line">[root@k8s-master k8s-yamls]<span class="comment"># kubectl get pod</span></span><br><span class="line">NAME                                READY   STATUS    RESTARTS   AGE</span><br><span class="line">nginx-deployment-54f57cf6bf-528xn   1/1     Running   0          4m35s</span><br><span class="line">nginx-deployment-54f57cf6bf-bgclh   1/1     Running   0          4m35s</span><br><span class="line"></span><br><span class="line"><span class="comment">#删除</span></span><br><span class="line">[root@k8s-master k8s-yamls]<span class="comment"># kubectl delete -f nginx-deployment.yaml </span></span><br><span class="line">deployment.apps <span class="string">"nginx-deployment"</span> deleted</span><br></pre></td></tr></table></figure>
+
+<h2 id="必填字段"><a href="#必填字段" class="headerlink" title="必填字段"></a>必填字段</h2><p>在上述的 <code>.yaml</code> 文件中，如下字段是必须填写的：</p>
+<ul>
+<li><strong>apiVersion</strong> 用来创建对象时所使用的Kubernetes API版本</li>
+<li><strong>kind</strong> 被创建对象的类型</li>
+<li><strong>metadata</strong> 用于唯一确定该对象的元数据：包括 <code>name</code> 和 <code>namespace</code>，如果 <code>namespace</code> 为空，则默认值为 <code>default</code></li>
+<li><strong>spec</strong> 描述您对该对象的期望状态</li>
+</ul>
+<h1 id="二、管理Kubernetes对象"><a href="#二、管理Kubernetes对象" class="headerlink" title="二、管理Kubernetes对象"></a>二、管理Kubernetes对象</h1><h2 id="三种管理方式"><a href="#三种管理方式" class="headerlink" title="三种管理方式"></a>三种管理方式</h2><table>
+<thead>
+<tr>
+<th>管理方式</th>
+<th>操作对象</th>
+<th>推荐的环境</th>
+<th>参与编辑的人数</th>
+<th>学习曲线</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>指令性的命令行</td>
+<td>Kubernetes对象</td>
+<td>开发环境</td>
+<td>1+</td>
+<td>最低</td>
+</tr>
+<tr>
+<td>指令性的对象配置</td>
+<td>单个 yaml 文件</td>
+<td>生产环境</td>
+<td>1</td>
+<td>适中</td>
+</tr>
+<tr>
+<td>声明式的对象配置</td>
+<td>包含多个 yaml 文件的多个目录</td>
+<td>生产环境</td>
+<td>1+</td>
+<td>最高</td>
+</tr>
+</tbody></table>
+<h2 id="指令性的命令行"><a href="#指令性的命令行" class="headerlink" title="指令性的命令行"></a>指令性的命令行</h2><p>当使用指令性的命令行（imperative commands）时，用户通过向 <code>kubectl</code> 命令提供参数的方式，直接操作集群中的 Kubernetes 对象。此时，用户无需编写或修改 <code>.yaml</code> 文件。</p>
+<p>这是在 Kubernetes 集群中执行一次性任务的一个简便的办法。由于这种方式直接修改 Kubernetes 对象，也就无法提供历史配置查看的功能。</p>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>创建一个 Deployment 对象，以运行一个 nginx 实例：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl run nginx --image nginx</span><br></pre></td></tr></table></figure>
+
+<p>下面的命令完成了相同的任务，但是命令格式不同：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create deployment nginx --image nginx</span><br></pre></td></tr></table></figure>
+
+<h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><p>与编写 <code>.yaml</code> 文件进行配置的方式相比的优势：</p>
+<ul>
+<li>命令简单，易学易记，只需要一个步骤，就可以对集群执行变更</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>使用命令，无法进行变更review的管理；不提供日志审计；没有创建新对象的模板</li>
+</ul>
+<h2 id="指令性的对象配置"><a href="#指令性的对象配置" class="headerlink" title="指令性的对象配置"></a>指令性的对象配置</h2><p>使用指令性的对象配置（imperative object configuration）时，需要向 kubectl 命令指定具体的操作（create,replace,apply,delete等），可选参数以及至少一个配置文件的名字。配置文件中必须包括一个完整的对象的定义，可以是 yaml 格式，也可以是 json 格式。</p>
+<p>通过配置文件创建对象 </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f nginx.yaml</span><br></pre></td></tr></table></figure>
+
+<p>删除两个配置文件中的对象 </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl delete -f nginx.yaml -f redis.yaml</span><br></pre></td></tr></table></figure>
+
+<p>直接使用配置文件中的对象定义，替换Kubernetes中对应的对象： </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl replace -f nginx.yaml</span><br></pre></td></tr></table></figure>
+
+<h2 id="声明式的对象配置"><a href="#声明式的对象配置" class="headerlink" title="声明式的对象配置"></a>声明式的对象配置</h2><p>当使用声明式的对象配置时，用户操作本地存储的Kubernetes对象配置文件，然而，在将文件传递给 kubectl 命令时，并不指定具体的操作，由 kubectl 自动检查每一个对象的状态并自行决定是创建、更新、还是删除该对象。使用这种方法时，可以直接针对一个或多个文件目录进行操作（对不同的对象可能需要执行不同的操作）。</p>
+<p>处理 <code>configs</code> 目录中所有配置文件中的Kubernetes对象，根据情况创建对象、或更新Kubernetes中已经存在的对象。可以先执行 <code>diff</code> 指令查看具体的变更，然后执行 <code>apply</code> 指令执行变更： </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">kubectl diff -f configs/</span><br><span class="line">kubectl apply -f configs/</span><br><span class="line"></span><br><span class="line"><span class="comment">#递归处理目录中的内容</span></span><br><span class="line">kubectl diff -R -f configs/</span><br><span class="line">kubectl apply -R -f configs/</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、名称"><a href="#三、名称" class="headerlink" title="三、名称"></a>三、名称</h1><p> Kubernetes REST API 中，所有的对象都是通过 <code>name</code> 和 <code>UID</code> 唯一性确定。 </p>
+<h2 id="Names"><a href="#Names" class="headerlink" title="Names"></a>Names</h2><p> 同一个名称空间下，同一个类型的对象，可以通过 <code>name</code> 唯一性确定。如果删除该对象之后，可以再重新创建一个同名对象。 </p>
+<p> 例如，下面的配置文件定义了一个 name 为 <code>nginx-demo</code> 的 Pod，该 Pod 包含一个 name 为 <code>nginx</code> 的容器： </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-demo</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">nginx:1.7.9</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="UIDs"><a href="#UIDs" class="headerlink" title="UIDs"></a>UIDs</h2><p>UID 是由 Kubernetes 系统生成的，唯一标识某个 Kubernetes 对象的字符串。</p>
+<p>Kubernetes集群中，每创建一个对象，都有一个唯一的 UID。用于区分多次创建的同名对象（如前所述，按照名字删除对象后，重新再创建同名对象时，两次创建的对象 name 相同，但是 UID 不同。）</p>
+<h1 id="四、名称空间"><a href="#四、名称空间" class="headerlink" title="四、名称空间"></a>四、名称空间</h1><h2 id="何时使用名称空间"><a href="#何时使用名称空间" class="headerlink" title="何时使用名称空间"></a>何时使用名称空间</h2><ol>
+<li>名称空间的用途是，为不同团队的用户（或项目）提供虚拟的集群空间（划分集群的资源），也可以用来区分开发环境/测试环境、准上线环境/生产环境。</li>
+<li>名称空间为<code>名称</code>提供了作用域。名称空间内部的同类型对象不能重名，但是跨名称空间可以有同名同类型对象。名称空间不可以嵌套，任何一个Kubernetes对象只能在一个名称空间中。</li>
+<li>在 Kubernetes 将来的版本中，同名称空间下的对象将默认使用相同的访问控制策略。</li>
+<li>当Kubernetes对象之间的差异不大时，无需使用名称空间来区分，例如，同一个软件的不同版本，只需要使用 labels 来区分即可。</li>
+</ol>
+<h2 id="如何使用名称空间"><a href="#如何使用名称空间" class="headerlink" title="如何使用名称空间"></a>如何使用名称空间</h2><h3 id="查看名称空间"><a href="#查看名称空间" class="headerlink" title="查看名称空间"></a>查看名称空间</h3><p>执行命令 <code>kubectl get namespaces</code> 可以查看名称空间</p>
+<p>Kubernetes 安装成功后，默认有初始化了三个名称空间：</p>
+<ul>
+<li><strong>default</strong> 默认名称空间，如果 Kubernetes 对象中不定义 <code>metadata.namespace</code> 字段，该对象将放在此名称空间下</li>
+<li><strong>kube-system</strong> Kubernetes系统创建的对象放在此名称空间下</li>
+<li><strong>kube-public</strong> 此名称空间自动在安装集群是自动创建，并且所有用户都是可以读取的（即使是那些未登录的用户）。主要是为集群预留的，例如，某些情况下，某些Kubernetes对象应该被所有集群用户看到。</li>
+</ul>
+<h3 id="在执行请求时设定namespace"><a href="#在执行请求时设定namespace" class="headerlink" title="在执行请求时设定namespace"></a>在执行请求时设定namespace</h3><p>执行 kubectl 命令时，可以使用 <code>--namespace</code> 参数指定名称空间，例如：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl run nginx --image=nginx --namespace=&lt;your_namespace&gt;</span><br><span class="line">kubectl get pods --namespace=&lt;your_namespace&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置名称空间偏好"><a href="#设置名称空间偏好" class="headerlink" title="设置名称空间偏好"></a>设置名称空间偏好</h3><p>可以通过 <code>set-context</code> 命令改变当前<code>kubectl 上下文</code>的名称空间，后续所有命令都默认在此名称空间下执行。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kubectl config <span class="built_in">set</span>-context --current --namespace=&lt;your_namespace&gt;</span><br><span class="line"><span class="comment"># 验证结果</span></span><br><span class="line">kubectl config view --minify | grep namespace:</span><br></pre></td></tr></table></figure>
+
+<h2 id="名称空间与DNS"><a href="#名称空间与DNS" class="headerlink" title="名称空间与DNS"></a>名称空间与DNS</h2><p>当创建一个 Service 时，Kubernetes 为其创建一个对应的<code>DNS 条目</code>。该 DNS 记录的格式为  <code>&lt;service-name&gt;.&lt;namespace-name&gt;.svc.cluster.local</code> ，也就是说，如果在容器中只使用 <code>&lt;service-name&gt;</code> ，其DNS将解析到同名称空间下的 Service。这个特点在多环境的情况下非常有用，例如将开发环境、测试环境、生产环境部署在不同的名称空间下，应用程序只需要使用<code>&lt;service-name&gt;</code>即可进行服务发现，无需为不同的环境修改配置。如果跨名称空间访问服务，则必须使用完整的域名（fully qualified domain name，FQDN）。</p>
+<h2 id="并非所有对象都在名称空间里"><a href="#并非所有对象都在名称空间里" class="headerlink" title="并非所有对象都在名称空间里"></a>并非所有对象都在名称空间里</h2><p>大部分的 Kubernetes 对象（例如，Pod、Service、Deployment、StatefulSet等）都必须在名称空间里。但是某些更低层级的对象，是不在任何名称空间中的，例如nodes、persistentVolumes、storageClass等</p>
+<p>执行一下命令可查看哪些 Kubernetes 对象在名称空间里，哪些不在：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在名称空间里</span></span><br><span class="line">kubectl api-resources --namespaced=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 不在名称空间里</span></span><br><span class="line">kubectl api-resources --namespaced=<span class="literal">false</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/27/kubeadm%E5%AE%89%E8%A3%85Kubernetes1-16-3/" rel="prev" title="kubeadm安装Kubernetes1.16.3">
+      <i class="fa fa-chevron-left"></i> kubeadm安装Kubernetes1.16.3
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、什么是Kubernetes对象"><span class="nav-number">1.</span> <span class="nav-text">1、什么是Kubernetes对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对象的spec和status"><span class="nav-number">1.1.</span> <span class="nav-text">对象的spec和status</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#描述Kubernetes对象"><span class="nav-number">1.2.</span> <span class="nav-text">描述Kubernetes对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#必填字段"><span class="nav-number">1.3.</span> <span class="nav-text">必填字段</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、管理Kubernetes对象"><span class="nav-number">2.</span> <span class="nav-text">二、管理Kubernetes对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#三种管理方式"><span class="nav-number">2.1.</span> <span class="nav-text">三种管理方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指令性的命令行"><span class="nav-number">2.2.</span> <span class="nav-text">指令性的命令行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#例子"><span class="nav-number">2.2.1.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优缺点"><span class="nav-number">2.2.2.</span> <span class="nav-text">优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指令性的对象配置"><span class="nav-number">2.3.</span> <span class="nav-text">指令性的对象配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#声明式的对象配置"><span class="nav-number">2.4.</span> <span class="nav-text">声明式的对象配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、名称"><span class="nav-number">3.</span> <span class="nav-text">三、名称</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Names"><span class="nav-number">3.1.</span> <span class="nav-text">Names</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIDs"><span class="nav-number">3.2.</span> <span class="nav-text">UIDs</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、名称空间"><span class="nav-number">4.</span> <span class="nav-text">四、名称空间</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#何时使用名称空间"><span class="nav-number">4.1.</span> <span class="nav-text">何时使用名称空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用名称空间"><span class="nav-number">4.2.</span> <span class="nav-text">如何使用名称空间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看名称空间"><span class="nav-number">4.2.1.</span> <span class="nav-text">查看名称空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在执行请求时设定namespace"><span class="nav-number">4.2.2.</span> <span class="nav-text">在执行请求时设定namespace</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置名称空间偏好"><span class="nav-number">4.2.3.</span> <span class="nav-text">设置名称空间偏好</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#名称空间与DNS"><span class="nav-number">4.3.</span> <span class="nav-text">名称空间与DNS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并非所有对象都在名称空间里"><span class="nav-number">4.4.</span> <span class="nav-text">并非所有对象都在名称空间里</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">duoyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">duoyu</span>
+</div>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
