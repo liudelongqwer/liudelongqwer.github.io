@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2020/03/31/K8s%E5%AE%B9%E5%99%A8%E7%BB%84/</loc>
+    
+    <lastmod>2020-04-01T06:07:02.600Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/03/28/Kubernetes%E5%AE%B9%E5%99%A8/</loc>
     
     <lastmod>2020-03-28T07:35:24.859Z</lastmod>
