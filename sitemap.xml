@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2020/04/08/K8s-Service/</loc>
+    
+    <lastmod>2020-04-08T07:59:36.978Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/04/08/%E6%8E%A7%E5%88%B6%E5%99%A8-CronJob/</loc>
     
-    <lastmod>2020-04-08T03:47:59.198Z</lastmod>
+    <lastmod>2020-04-08T05:31:25.505Z</lastmod>
     
   </url>
   
