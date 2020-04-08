@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="控制器CronJob： 周期性任务控制，不需要持续后台运行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="控制器-CronJob">
+<meta property="og:url" content="http://yoursite.com/2020/04/08/%E6%8E%A7%E5%88%B6%E5%99%A8-CronJob/index.html">
+<meta property="og:site_name" content="拒绝再玩">
+<meta property="og:description" content="控制器CronJob： 周期性任务控制，不需要持续后台运行">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-08T02:20:54.000Z">
+<meta property="article:modified_time" content="2020-04-08T03:47:59.198Z">
+<meta property="article:author" content="duoyu">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/04/08/%E6%8E%A7%E5%88%B6%E5%99%A8-CronJob/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>控制器-CronJob | 拒绝再玩</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="拒绝再玩" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">拒绝再玩</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/08/%E6%8E%A7%E5%88%B6%E5%99%A8-CronJob/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          控制器-CronJob
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-08 10:20:54 / 修改时间：11:47:59" itemprop="dateCreated datePublished" datetime="2020-04-08T10:20:54+08:00">2020-04-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p> <strong>控制器CronJob：</strong> 周期性任务控制，不需要持续后台运行 </p>
+ <a id="more"></a> 
+
+<h1 id="CronJob"><a href="#CronJob" class="headerlink" title="CronJob"></a>CronJob</h1><p> CronJob 按照预定的时间计划（schedule）创建 Job。一个 CronJob 对象类似于 crontab (cron table) 文件中的一行记录。该对象根据 Cron 格式定义的时间计划，周期性地创建 Job 对象。 </p>
+<p> CronJob 只负责按照时间计划的规定创建 Job 对象，由 Job 来负责管理具体 Pod 的创建和执行。 </p>
+<h1 id="使用CronJob执行自动任务"><a href="#使用CronJob执行自动任务" class="headerlink" title="使用CronJob执行自动任务"></a>使用CronJob执行自动任务</h1><p>CronJob可以用来执行基于时间计划的定时任务，类似于Linux/Unix系统中的crontable。</p>
+<p>CronJob 执行周期性的重复任务时非常有用，例如备份数据、发送邮件等。CronJob 也可以用来指定将来某个时间点执行单个任务，例如将某项任务定时到系统负载比较低的时候执行。</p>
+<p>CronJob 也存在某些限制，例如，在某些情况下，一个 CronJob 可能会创建多个 Job。因此，Job 必须是幂等的。</p>
+<h2 id="创建CronJob"><a href="#创建CronJob" class="headerlink" title="创建CronJob"></a>创建CronJob</h2><p>下面例子中的 CronJob 每分钟，打印一次当前时间并输出 hello world 信息。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">batch/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">CronJob</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">hello</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">schedule:</span> <span class="string">"*/1 * * * *"</span></span><br><span class="line">  <span class="attr">jobTemplate:</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">template:</span></span><br><span class="line">        <span class="attr">spec:</span></span><br><span class="line">          <span class="attr">containers:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">hello</span></span><br><span class="line">            <span class="attr">image:</span> <span class="string">busybox</span></span><br><span class="line">            <span class="attr">args:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">/bin/sh</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">-c</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">date;</span> <span class="string">echo</span> <span class="string">Hello</span> <span class="string">from</span> <span class="string">the</span> <span class="string">Kubernetes</span> <span class="string">cluster</span></span><br><span class="line">          <span class="attr">restartPolicy:</span> <span class="string">OnFailure</span></span><br></pre></td></tr></table></figure>
+
+<p> 执行命令以创建 CronJob： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0407]# kubectl create -f cronjob.yaml </span><br><span class="line">cronjob.batch&#x2F;hello created</span><br></pre></td></tr></table></figure>
+
+<p>或者直接用kubectl run 命令来创建CronJob</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl run hello --schedule=<span class="string">"*/1 * * * *"</span> --restart=OnFailure --image=busybox -- /bin/sh -c <span class="string">"date; echo Hello from the Kubernetes cluster"</span></span><br></pre></td></tr></table></figure>
+
+<p>查看已创建的CronJob</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0407]# kubectl get cronjob hello</span><br><span class="line">NAME    SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE</span><br><span class="line">hello   *&#x2F;1 * * * *   False     1        31s             16m</span><br></pre></td></tr></table></figure>
+
+<p>输出结果显示，该 CronJob 在 <code>LAST SCHEDULE</code> 这个时间点成功创建了一个 Job。当前 <code>ACTIVE</code> Job 数为 0，意味着，该 Job 已经成功结束，或者已经失败。 </p>
+<h2 id="删除CronJob"><a href="#删除CronJob" class="headerlink" title="删除CronJob"></a>删除CronJob</h2><p>当您不再需要某个 CronJob 时，可以使用命令将其删除 <code>kubectl delete cronjob</code>，在本例中，可以执行命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">kubectl delete cronjob hello</span><br><span class="line">cronjob.batch <span class="string">"hello"</span> deleted</span><br><span class="line"></span><br><span class="line">或者</span><br><span class="line">kubectl delete -f  cronjob.yaml</span><br></pre></td></tr></table></figure>
+
+<p>删除 CronJob 时，将移除该 CronJob 创建的所有 Job 和 Pod，并且 CronJob 控制器将不会为其在创建任何新的 Job。 </p>
+<h2 id="写CronJob-YAML"><a href="#写CronJob-YAML" class="headerlink" title="写CronJob YAML"></a>写CronJob YAML</h2><p>与其他所有 Kubernetes 对象一样，CronJob 对象需要 <code>apiVersion</code>、<code>kind</code>、<code>metadata</code> 这几个字段。CronJob 还需要 <code>.spec</code> 字段。</p>
+<p>所有对 CronJob 对象作出的修改，尤其是 <code>.spec</code> 的修改，都只对修改之后新建的 Job 有效，已经创建的 Job 不会受到影响</p>
+<h3 id="Schedule"><a href="#Schedule" class="headerlink" title="Schedule"></a>Schedule</h3><p><code>.spec.schedule</code> 是一个必填字段。类型为 Cron 格式的字符串，例如 <code>0 * * * *</code> 或者 <code>@hourly</code>，该字段定义了 CronJob 应该何时创建和执行 Job。</p>
+<p>该字段同样支持 <code>vixie cron</code> step 值，指定 CronJob 每隔两个小时执行一次，可以有如下三种写法：</p>
+<ul>
+<li><code>0 0,2,4,5,6,8,12,14,16,17,20,22 * * *</code>）</li>
+<li>使用 范围值 + Step 值的写法：<code>0 0-23/2 * * *</code></li>
+<li>Step 也可以跟在一个星号后面，如 <code>0 */2 * * *</code></li>
+</ul>
+<p>问号 <code>?</code> 与 星号 <code>*</code> 的含义相同，代表着该字段不做限定</p>
+<h3 id="Job-Template"><a href="#Job-Template" class="headerlink" title="Job Template"></a>Job Template</h3><p><code>.spec.jobTemplate</code> 字段是必填字段。该字段的结构与Job相同，只是不需要 <code>apiVersion</code> 和 <code>kind</code>。</p>
+<h3 id="tarting-Deadline"><a href="#tarting-Deadline" class="headerlink" title="tarting Deadline"></a>tarting Deadline</h3><p><code>.spec.startingDeadlineSeconds</code> 为可选字段，代表着从计划的时间点开始，最迟多少秒之内必须启动 Job。如果超过了这个时间点，CronJob 就不会为其创建 Job，并将其记录为一次错过的执行次数。如果该字段未指定，则 Job 必须在指定的时间点执行。</p>
+<p>CronJob 控制器将为每一个 CronJob 记录错过了多少次执行次数，如果错过的执行次数超过 100，则控制器将不会再为该 CronJob 创建新的 Job。如果 <code>.spec.startingDeadlineSeconds</code> 未指定，CronJob 控制器计算从 <code>.status.lastScheduleTime</code> 开始到现在为止总共错过的执行次数。</p>
+<p>例如，某一个 CronJob 应该每分钟执行一次，<code>.status.lastScheduleTime</code> 的值是 上午5:00，假设现在已经是上午7:00。这意味着已经有 120 次执行时间点被错过，因此该 CronJob 将不再执行了。</p>
+<p>如果 <code>.spec.startingDeadlineSeconds</code> 字段被设置为一个非空的值，则 CronJob 控制器计算将从 <code>.spec.startingDeadlineSeconds</code> 秒以前到现在这个时间段内错过的执行次数。</p>
+<p>例如，假设该字段被设置为 <code>200</code>，控制器将只计算过去 200 秒内错过的执行次数。如果在过去 200 秒之内，有超过 100 次错过的执行次数，则 CronJob 将不再执行。</p>
+<h3 id="Concurrency-Policy"><a href="#Concurrency-Policy" class="headerlink" title="Concurrency Policy"></a>Concurrency Policy</h3><p><code>.spec.concurrencyPolicy</code> 是选填字段，指定了如何控制该 CronJob 创建的 Job 的并发性，可选的值有：</p>
+<ul>
+<li><code>Allow</code>： 默认值，允许并发运行 Job</li>
+<li><code>Forbid</code>： 不允许并发运行 Job；如果新的执行时间点到了，而上一个 Job 还未执行完，则 CronJob 将跳过新的执行时间点，保留仍在运行的 Job，且不会在此刻创建新的 Job</li>
+<li><code>Replace</code>： 如果新的执行时间点到了，而上一个 Job 还未执行完，则 CronJob 将创建一个新的 Job 以替代正在执行的 Job</li>
+</ul>
+<p>TIP</p>
+<p>Concurrency policy 只对由同一个 CronJob 创建的 Job 生效。如果有多个 CronJob，则他们各自创建的 Job 之间不会相互影响。</p>
+<h3 id="Suspend"><a href="#Suspend" class="headerlink" title="Suspend"></a>Suspend</h3><p><code>.spec.suspend</code> 是选填字段。如果该字段设置为 <code>true</code>，所有的后续执行都将挂起，该字段不会影响到已经创建的 Job。默认值为 <code>false</code>。</p>
+<p><strong>警告</strong></p>
+<p>挂起（suspend）的时间段内，如果恰好存在有计划的执行时间点，则这些执行时间计划都被记录下来。如果不指定 <code>.spec.startingDeadlineSeconds</code>，并将 <code>.spec.suspend</code> 字段从 <code>true</code> 修改为 <code>false</code>，则挂起这段时间内的执行计划都将被立刻执行。</p>
+<h3 id="Job-History-Limits"><a href="#Job-History-Limits" class="headerlink" title="Job History Limits"></a>Job History Limits</h3><p><code>.spec.successfulJobsHistoryLimit</code> 和 <code>.spec.failedJobsHistoryLimit</code> 字段是可选的。这些字段指定了 CronJob 应该保留多少个 completed 和 failed 的 Job 记录。</p>
+<ul>
+<li><code>.spec.successfulJobsHistoryLimit</code> 的默认值为 3</li>
+<li><code>.spec.failedJobsHistoryLimit</code> 的默认值为 1</li>
+</ul>
+<p>如果将其设置为 <code>0</code>，则 CronJob 不会保留已经结束的 Job 的记录。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/07/%E6%8E%A7%E5%88%B6%E5%99%A8-Job/" rel="prev" title="控制器-Job">
+      <i class="fa fa-chevron-left"></i> 控制器-Job
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CronJob"><span class="nav-number">1.</span> <span class="nav-text">CronJob</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用CronJob执行自动任务"><span class="nav-number">2.</span> <span class="nav-text">使用CronJob执行自动任务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建CronJob"><span class="nav-number">2.1.</span> <span class="nav-text">创建CronJob</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除CronJob"><span class="nav-number">2.2.</span> <span class="nav-text">删除CronJob</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写CronJob-YAML"><span class="nav-number">2.3.</span> <span class="nav-text">写CronJob YAML</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Schedule"><span class="nav-number">2.3.1.</span> <span class="nav-text">Schedule</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Job-Template"><span class="nav-number">2.3.2.</span> <span class="nav-text">Job Template</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tarting-Deadline"><span class="nav-number">2.3.3.</span> <span class="nav-text">tarting Deadline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Concurrency-Policy"><span class="nav-number">2.3.4.</span> <span class="nav-text">Concurrency Policy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Suspend"><span class="nav-number">2.3.5.</span> <span class="nav-text">Suspend</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Job-History-Limits"><span class="nav-number">2.3.6.</span> <span class="nav-text">Job History Limits</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">duoyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">duoyu</span>
+</div>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
