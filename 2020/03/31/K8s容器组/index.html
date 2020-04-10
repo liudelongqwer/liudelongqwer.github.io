@@ -252,7 +252,7 @@
 </li>
 <li><p>节点出现故障（例如死机）</p>
 </li>
-<li><input disabled="" type="checkbox"> <p>Pod 本身并不会运行，Pod 仅仅是容器运行的一个环境 </p>
+<li><input disabled type="checkbox"> <p>Pod 本身并不会运行，Pod 仅仅是容器运行的一个环境 </p>
 </li>
 </ul>
 <p>Pod 本身并不能自愈（self-healing）。如果一个 Pod 所在的 Node （节点）出现故障，或者调度程序自身出现故障，Pod 将被删除；同理，当因为节点资源不够或节点维护而驱逐 Pod 时，Pod 也将被删除。Kubernetes 通过引入 Controller（控制器）的概念来管理 Pod 实例。在 Kubernetes 中，更为推荐的做法是使用 Controller 来管理 Pod，而不是直接创建 Pod。 </p>
