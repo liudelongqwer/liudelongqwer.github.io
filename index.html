@@ -146,6 +146,125 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/14/Kubernetes%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/14/Kubernetes%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">Kubernetes网络模型</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-14 14:55:20 / 修改时间：16:48:55" itemprop="dateCreated datePublished" datetime="2020-04-14T14:55:20+08:00">2020-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Kubernetes网络模型"><a href="#Kubernetes网络模型" class="headerlink" title="Kubernetes网络模型"></a>Kubernetes网络模型</h1><h2 id="Kubernetes基本概念"><a href="#Kubernetes基本概念" class="headerlink" title="Kubernetes基本概念"></a>Kubernetes基本概念</h2><p>Kubernetes 基于少数几个核心概念，不断完善，提供了非常丰富和实用的功能。本章节罗列了这些核心概念，并简要的做了概述，以便更好地支持后面的讨论。熟悉 Kubernetes 的读者可跳过这个章节。</p>
+<h3 id="Kubernetes-API-Server"><a href="#Kubernetes-API-Server" class="headerlink" title="Kubernetes API Server"></a>Kubernetes API Server</h3><p>操作 Kubernetes 的方式，是调用 Kubernetes API Server（kube-apiserver）的 API 接口。kubectl、kubernetes dashboard、kuboard 都是通过调用 kube-apiserver 的接口实现对 kubernetes 的管理。API server 最终将集群状态的数据存储在 <a href="https://github.com/coreos/etcd" target="_blank" rel="noopener">etcd</a> 中。</p>
+<h3 id="控制器Controller"><a href="#控制器Controller" class="headerlink" title="控制器Controller"></a>控制器Controller</h3><p>控制器（Controller）是 Kubernetes 中最核心的抽象概念。在用户通过 kube-apiserver 声明了期望的状态以后，控制器通过不断监控 apiserver 中的当前状态，并对当前状态与期望状态之间的差异做出反应，以确保集群的当前状态不断地接近用户声明的期望状态。这个过程实现在一个循环中，参考如下伪代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">while <span class="literal">true</span>:</span><br><span class="line">  X = currentState()</span><br><span class="line">  Y = desiredState()</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> X == Y:</span><br><span class="line">    <span class="keyword">return</span>  # Do nothing</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">    do(tasks to get to Y)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>例如，当你通过 API Server 创建一个新的 Pod 对象时，Kubernetes调度器（是一个控制器）注意到此变化，并做出将该 Pod 运行在集群中哪个节点的决定。然后，通过 API Server 修改 Pod 对象的状态。此时，对应节点上的kubelet（是一个控制器）注意到此变化，并将在其所在节点运行该 Pod，设置需要的网络，使 Pod 在集群内可以访问。此处，两个控制器针对不同的状态变化做出反应，以使集群的当前状态与用户指定的期望状态匹配。</p>
+<h3 id="容器组Pod"><a href="#容器组Pod" class="headerlink" title="容器组Pod"></a>容器组Pod</h3><p>Pod 是 Kubernetes 中的最小可部署单元。一个 Pod 代表了集群中运行的一个工作负载，可以包括一个或多个 docker 容器、挂载需要的存储，并拥有唯一的 IP 地址。Pod 中的多个容器将始终在同一个节点上运行。</p>
+<h3 id="节点Node"><a href="#节点Node" class="headerlink" title="节点Node"></a>节点Node</h3><p>节点是Kubernetes集群中的一台机器，可以是物理机，也可以是虚拟机。</p>
+<h2 id="Kubernetes网络模型-1"><a href="#Kubernetes网络模型-1" class="headerlink" title="Kubernetes网络模型"></a>Kubernetes网络模型</h2><p>关于 Pod 如何接入网络这件事情，Kubernetes 做出了明确的选择。具体来说，Kubernetes 要求所有的网络插件实现必须满足如下要求：</p>
+<ul>
+<li>所有的 Pod 可以与任何其他 Pod 直接通信，无需使用 NAT 映射（network address translation）</li>
+<li>所有节点可以与所有 Pod 直接通信，无需使用 NAT 映射</li>
+<li>Pod 内部获取到的 IP 地址与其他 Pod 或节点与其通信时的 IP 地址是同一个</li>
+</ul>
+<p>在这些限制条件下，需要解决如下四种完全不同的网络使用场景的问题：</p>
+<ol>
+<li>Container-to-Container 的网络</li>
+<li>Pod-to-Pod 的网络</li>
+<li>Pod-to-Service 的网络</li>
+<li>Internet-to-Service 的网络</li>
+</ol>
+<h2 id="Container-to-Container的网络"><a href="#Container-to-Container的网络" class="headerlink" title="Container-to-Container的网络"></a>Container-to-Container的网络</h2><p>Linux系统中，每一个进程都在一个 network namespace 中进行通信，network namespace 提供了一个逻辑上的网络堆栈（包含自己的路由、防火墙规则、网络设备）。换句话说，network namespace 为其中的所有进程提供了一个全新的网络堆栈。 </p>
+<p>Linux 用户可以使用 <code>ip</code> 命令创建 network namespace。</p>
+<p>例如，下面的命令创建了一个新的 network namespace 名称为 <code>ns1</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ip netns add ns1</span><br></pre></td></tr></table></figure>
+
+<p>当创建 network namespace 时，同时将在 <code>/var/run/netns</code> 下创建一个挂载点（mount point）用于存储该 namespace 的信息。</p>
+<p>执行 <code>ls /var/run/netns</code> 命令，或执行 <code>ip</code> 命令，可以查看所有的 network namespace： </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ ls /var/run/netns</span><br><span class="line">ns1</span><br><span class="line">$ ip netns</span><br><span class="line">ns1</span><br></pre></td></tr></table></figure>
+
+<p>默认情况下，Linux 将所有的进程都分配到 root network namespace，以使得进程可以访问外部网络，如下图所示： </p>
+<p><img src="/2020/04/14/Kubernetes%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/1.png" alt></p>
+<p>在 Kubernetes 中，Pod 是一组 docker 容器的集合，这一组 docker 容器将共享一个 network namespace。Pod 中所有的容器都：</p>
+<ul>
+<li>使用该 network namespace 提供的同一个 IP 地址以及同一个端口空间</li>
+<li>可以通过 localhost 直接与同一个 Pod 中的另一个容器通信</li>
+</ul>
+<p>Kubernetes 为每一个 Pod 都创建了一个 network namespace。具体做法是，把一个 Docker 容器当做 “Pod Container” 用来获取 network namespace，在创建 Pod 中新的容器时，都使用 docker run 的 <code>--network:container</code> 功能来加入该 network namespace。</p>
+<p>如下图所示，每一个 Pod 都包含了多个 docker 容器（<code>ctr*</code>），这些容器都在同一个共享的 network namespace 中：</p>
+<p><img src="/2020/04/14/Kubernetes%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/2.png" alt></p>
+<p>此外，Pod 中可以定义数据卷，Pod 中的容器都可以共享这些数据卷，并通过挂载点挂载到容器内部不同的路径。</p>
+<h2 id="Pod-to-Pod的网络"><a href="#Pod-to-Pod的网络" class="headerlink" title="Pod-to-Pod的网络"></a>Pod-to-Pod的网络</h2><p>在 Kubernetes 中，每一个 Pod 都有一个真实的 IP 地址，并且每一个 Pod 都可以使用此 IP 地址与 其他 Pod 通信。Pod-to-Pod 通信中使用真实 IP ，不管两个 Pod 是在同一个节点上，还是集群中的不同节点上。</p>
+<p>从 Pod 的视角来看，Pod 是在其自身所在的 network namespace 与同节点上另外一个 network namespace 进程通信。在Linux上，不同的 network namespace 可以通过 <strong>Virtual Ethernet Device</strong> 或 <strong><em>veth pair</em></strong> (两块跨多个名称空间的虚拟网卡)进行通信。为连接 pod 的 network namespace，可以将 <strong><em>veth pair</em></strong> 的一段指定到 root network namespace，另一端指定到 Pod 的 network namespace。每一组 <strong><em>veth pair</em></strong> 类似于一条网线，连接两端，并可以使流量通过。节点上有多少个 Pod，就会设置多少组 <strong><em>veth pair</em></strong>。下图展示了 veth pair 连接 Pod 到 root namespace 的情况：</p>
+<p><img src="/2020/04/14/Kubernetes%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/3.png" alt></p>
+<p>此时，每个Pod 都有了自己的 network namespace，从 Pod 的角度来看，他们都有自己的以太网卡以及 IP 地址，并且都连接到了节点的 root network namespace。为了让 Pod 可以互相通过 root network namespace 通信，通过使用 network bridge（网桥）。</p>
+<p>Linux Ethernet bridge 是一个虚拟的 Layer 2 网络设备，可用来连接两个或多个网段（network segment）。网桥的工作原理是，在源于目标之间维护一个转发表（forwarding table），通过检查通过网桥的数据包的目标地址（destination）和该转发表来决定是否将数据包转发到与网桥相连的另一个网段。桥接代码通过网络中具备唯一性的网卡MAC地址来判断是否桥接或丢弃数据。</p>
+<p>网桥实现了 <code>ARP</code> 协议，以发现链路层与 IP 地址绑定的 MAC 地址。当网桥收到数据帧时，网桥将该数据帧广播到所有连接的设备上（除了发送者以外），对该数据帧做出相应的设备被记录到一个查找表中（lookup table）。后续网桥再收到发向同一个 IP 地址的流量时，将使用查找表（lookup table）来找到对应的 MAC 地址，并转发数据包。</p>
+<p><img src="/2020/04/14/Kubernetes%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/4.png" alt></p>
+<h3 id="数据包的传递：Pod-to-Pod，同节点"><a href="#数据包的传递：Pod-to-Pod，同节点" class="headerlink" title="数据包的传递：Pod-to-Pod，同节点"></a>数据包的传递：Pod-to-Pod，同节点</h3><p>在 network namespace 将每一个 Pod 隔离到各自的网络堆栈的情况下，虚拟以太网设备（virtual Ethernet device）将每一个 namespace 连接到 root namespace，网桥将 namespace 又连接到一起，此时，Pod 可以向同一节点上的另一个 Pod 发送网络报文了。下图演示了同节点上，网络报文从一个Pod传递到另一个Pod的情况。</p>
+<p><img src="/2020/04/14/Kubernetes%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/5.gif" alt></p>
+<p>Pod1 发送一个数据包到其自己的默认以太网设备 <code>eth0</code>。</p>
+<ol>
+<li>对 Pod1 来说，<code>eth0</code> 通过虚拟以太网设备（veth0）连接到 root namespace</li>
+<li>网桥 <code>cbr0</code> 中为 <code>veth0</code> 配置了一个网段。一旦数据包到达网桥，网桥使用 <code>ARP</code> 协议解析出其正确的目标网段 <code>veth1</code></li>
+<li>网桥 <code>cbr0</code> 将数据包发送到 <code>veth1</code></li>
+<li>数据包到达 <code>veth1</code> 时，被直接转发到 Pod2 的 network namespace 中的 <code>eth0</code> 网络设备。</li>
+</ol>
+<p>在整个数据包传递过程中，每一个 Pod 都只和 <code>localhost</code> 上的 <code>eth0</code> 通信，且数包被路由到正确的 Pod 上。与开发人员正常使用网络的习惯没有差异。</p>
+<p>Kubernetes 的网络模型规定，在跨节点的情况下 Pod 也必须可以通过 IP 地址访问。也就是说，Pod 的 IP 地址必须始终对集群中其他 Pod 可见；且从 Pod 内部和从 Pod 外部来看，Pod 的IP地址都是相同的。接下来我们讨论跨节点情况下，网络数据包如何传递。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/10/K8s-%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -847,87 +966,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/31/K8s%E5%AE%B9%E5%99%A8%E7%BB%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="duoyu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="拒绝再玩">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/31/K8s%E5%AE%B9%E5%99%A8%E7%BB%84/" class="post-title-link" itemprop="url">K8s容器组 Pod</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-31 15:06:33" itemprop="dateCreated datePublished" datetime="2020-03-31T15:06:33+08:00">2020-03-31</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-01 14:07:02" itemprop="dateModified" datetime="2020-04-01T14:07:02+08:00">2020-04-01</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Pod的相关理解</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/03/31/K8s%E5%AE%B9%E5%99%A8%E7%BB%84/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -998,7 +1036,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
