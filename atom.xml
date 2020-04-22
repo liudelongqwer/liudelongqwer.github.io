@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-04-17T02:55:30.993Z</updated>
+  <updated>2020-04-22T07:38:27.320Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>K8s-存储卷PersistentVolume</title>
+    <link href="http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/"/>
+    <id>http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/</id>
+    <published>2020-04-17T02:58:16.000Z</published>
+    <updated>2020-04-22T07:38:27.320Z</updated>
+    
+    <content type="html"><![CDATA[<p> PV &amp; PVC</p><a id="more"></a> <h1 id="存储卷PersistentVolume"><a href="#存储卷PersistentVolume" class="headerlink" title="存储卷PersistentVolume"></a>存储卷PersistentVolume</h1><p>PersistentVolume（PV 存储卷）是集群中的一块存储空间，由集群管理员管理、或者由 Storage Class（存储类）自动管理。PV（存储卷）和 node（节点）一样，是集群中的资源（kubernetes 集群由存储资源和计算资源组成）。</p><p>PersistentVolumeClaim（存储卷声明）是一种类型的 Volume（数据卷），PersistentVolumeClaim（存储卷声明）引用的 PersistentVolume（存储卷）有自己的生命周期，该生命周期独立于任何使用它的容器组。PersistentVolume（存储卷）描述了如何提供存储的细节信息（NFS、cephfs等存储的具体参数）。</p><p>PersistentVolumeClaim（PVC 存储卷声明）代表用户使用存储的请求。Pod 容器组消耗 node 计算资源，PVC 存储卷声明消耗 PersistentVolume 存储资源。Pod 容器组可以请求特定数量的计算资源（CPU / 内存）；PersistentVolumeClaim 可以请求特定大小/特定访问模式（只能被单节点读写/可被多节点只读/可被多节点读写）的存储资源。</p><p>根据应用程序的特点不同，其所需要的存储资源也存在不同的要求，例如读写性能等。集群管理员必须能够提供关于 PersistentVolume（存储卷）的更多选择，无需用户关心存储卷背后的实现细节。为了解决这个问题，Kubernetes 引入了 StorageClass（存储类）的概念</p><h2 id="存储卷和存储卷声明的关系"><a href="#存储卷和存储卷声明的关系" class="headerlink" title="存储卷和存储卷声明的关系"></a>存储卷和存储卷声明的关系</h2><p>存储卷和存储卷声明的关系如下图所示：</p><ul><li>PersistentVolume 是集群中的存储资源，通常由集群管理员创建和管理</li><li>StorageClass 用于对 PersistentVolume 进行分类，如果正确配置，StorageClass 也可以根据 PersistentVolumeClaim 的请求动态创建 Persistent Volume</li><li>PersistentVolumeClaim 是使用该资源的请求，通常由应用程序提出请求，并指定对应的 StorageClass 和需求的空间大小</li><li>PersistentVolumeClaim 可以做为数据卷的一种，被挂载到容器组/容器中使用</li></ul><p><img src="/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/1.jpg" alt></p><h2 id="存储卷声明的管理过程"><a href="#存储卷声明的管理过程" class="headerlink" title="存储卷声明的管理过程"></a>存储卷声明的管理过程</h2><p>PersistantVolume 和 PersistantVolumeClaim 的管理过程描述如下：</p><blockquote><p>下图主要描述的是 PV 和 PVC 的管理过程，因为绘制空间的问题，将挂载点与Pod关联了，实际结构应该如上图所示：</p><ul><li>Pod 中添加数据卷，数据卷关联PVC</li><li>Pod 中包含容器，容器挂载数据卷</li></ul></blockquote><p><img src="/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/1.png" alt></p><h3 id="1-提供-Provisioning"><a href="#1-提供-Provisioning" class="headerlink" title="1.提供 Provisioning"></a>1.提供 Provisioning</h3><p>有两种方式为 PersistentVolumeClaim 提供 PersistentVolume : 静态、动态</p><ul><li><p><strong>静态提供 Static</strong></p><p>集群管理员实现创建好一系列 PersistentVolume，它们包含了可供集群中应用程序使用的关于实际存储的具体信息。</p></li><li><p><strong>动态提供 Dynamic</strong></p><p>在配置有合适的 StorageClass（存储类）且 PersistentVolumeClaim 关联了该 StorageClass 的情况下，kubernetes 集群可以为应用程序动态创建 PersistentVolume。</p></li></ul><h3 id="2-绑定-Binding"><a href="#2-绑定-Binding" class="headerlink" title="2.绑定 Binding"></a>2.绑定 Binding</h3><p>假设用户创建了一个 PersistentVolumeClaim 存储卷声明，并指定了需求的存储空间大小以及访问模式。Kubernets master 将立刻为其匹配一个 PersistentVolume 存储卷，并将存储卷声明和存储卷绑定到一起。如果一个 PersistentVolume 是动态提供给一个新的 PersistentVolumeClaim，Kubernetes master 会始终将其绑定到该 PersistentVolumeClaim。除此之外，应用程序将被绑定一个不小于（可能大于）其 PersistentVolumeClaim 中请求的存储空间大小的 PersistentVolume。一旦绑定，PersistentVolumeClaim 将拒绝其他 PersistentVolume 的绑定关系。PVC 与 PV 之间的绑定关系是一对一的映射。</p><p>PersistentVolumeClaim 将始终停留在 <strong><em>未绑定 unbound</em></strong> 状态，直到有合适的 PersistentVolume 可用。举个例子：集群中已经存在一个 50Gi 的 PersistentVolume，同时有一个 100Gi 的 PersistentVolumeClaim，在这种情况下，该 PVC 将一直处于 <strong><em>未绑定 unbound</em></strong> 状态，直到管理员向集群中添加了一个 100Gi 的 PersistentVolume。</p><h3 id="3-使用-Using"><a href="#3-使用-Using" class="headerlink" title="3.使用 Using"></a>3.使用 Using</h3><p>对于 Pod 容器组来说，PersistentVolumeClaim 存储卷声明是一种类型的 Volume 数据卷。Kubernetes 集群将 PersistentVolumeClaim 所绑定的 PersistentVolume 挂载到容器组供其使用。</p><h3 id="4-使用中保护-Storage-Object-in-Use-Protection"><a href="#4-使用中保护-Storage-Object-in-Use-Protection" class="headerlink" title="4.使用中保护 Storage Object in Use Protection"></a>4.使用中保护 Storage Object in Use Protection</h3><ul><li>使用中保护的目的是确保正在被容器组使用的 PersistentVolumeClaim 以及其绑定的 PersistentVolume 不能被系统删除，以避免可能的数据丢失。</li><li>如果用户删除一个正在使用中的 PersistentVolumeClaim，则该 PVC 不会立即被移除掉，而是推迟到该 PVC 不在被任何容器组使用时才移除；同样的如果管理员删除了一个已经绑定到 PVC 的 PersistentVolume，则该 PV 也不会立刻被移除掉，而是推迟到其绑定的 PVC 被删除后才移除掉</li></ul><h3 id="5-回收-Reclaiming"><a href="#5-回收-Reclaiming" class="headerlink" title="5.回收 Reclaiming"></a>5.回收 Reclaiming</h3><p>当用户不在需要其数据卷时，可以删除掉其 PersistentVolumeClaim，此时其对应的 PersistentVolume 将被集群回收并再利用。Kubernetes 集群根据 PersistentVolume 中的 reclaim policy（回收策略）决定在其被回收时做对应的处理。当前支持的回收策略有：Retained（保留）、Recycled（重复利用）、Deleted（删除）</p><ul><li><p><strong>保留 Retain</strong></p><p>保留策略需要集群管理员手工回收该资源。当绑定的 PersistentVolumeClaim 被删除后，PersistentVolume 仍然存在，并被认为是”已释放“。但是此时该存储卷仍然不能被其他 PersistentVolumeClaim 绑定，因为前一个绑定的 PersistentVolumeClaim 对应容器组的数据还在其中。集群管理员可以通过如下步骤回收该 PersistentVolume：</p><ul><li>删除该 PersistentVolume。PV 删除后，其数据仍然存在于对应的外部存储介质中（nfs、cefpfs、glusterfs 等）</li><li>手工删除对应存储介质上的数据</li><li>手工删除对应的存储介质，您也可以创建一个新的 PersistentVolume 并再次使用该存储介质</li></ul></li><li><p><strong>删除 Delete</strong></p><p>删除策略将从 kubernete 集群移除 PersistentVolume 以及其关联的外部存储介质（云环境中的 AWA EBS、GCE PD、Azure Disk 或 Cinder volume）。</p></li><li><p><strong>再利用 Recycle</strong></p><ul><li>再利用策略将在 PersistentVolume 回收时，执行一个基本的清除操作（rm -rf /thevolume/*），并使其可以再次被新的 PersistentVolumeClaim 绑定。</li><li>集群管理员也可以自定义一个 recycler pod template，用于执行清除操作。</li></ul></li></ul><h2 id="存储卷类型"><a href="#存储卷类型" class="headerlink" title="存储卷类型"></a>存储卷类型</h2><p>Kubernetes 支持 20 种存储卷类型，如下所示：</p><ul><li>非持久性存储<ul><li>emptyDir</li><li>HostPath (只在单节点集群上用做测试目的)</li></ul></li><li>网络连接性存储<ul><li>SAN：iSCSI、ScaleIO Volumes、FC (Fibre Channel)</li><li>NFS：nfs，cfs</li></ul></li><li>分布式存储<ul><li>Glusterfs</li><li>RBD (Ceph Block Device)</li><li>CephFS</li><li>Portworx Volumes</li><li>Quobyte Volumes</li></ul></li><li>云端存储<ul><li>GCEPersistentDisk</li><li>AWSElasticBlockStore</li><li>AzureFile</li><li>AzureDisk</li><li>Cinder (OpenStack block storage)</li><li>VsphereVolume</li><li>StorageOS</li></ul></li><li>自定义存储<ul><li>FlexVolume</li></ul></li><li>不推荐<ul><li>Flocker</li></ul></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt; PV &amp;amp; PVC&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="kubernetes" scheme="http://yoursite.com/categories/kubernetes/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>K8s-数据卷Volume</title>
@@ -417,27 +438,6 @@
     <summary type="html">
     
       &lt;p&gt; Master-Node之间的通信&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="kubernetes" scheme="http://yoursite.com/categories/kubernetes/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>k8s进阶-架构-节点</title>
-    <link href="http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84/"/>
-    <id>http://yoursite.com/2020/03/26/k8s%E8%BF%9B%E9%98%B6-%E6%9E%B6%E6%9E%84/</id>
-    <published>2020-03-26T02:21:12.000Z</published>
-    <updated>2020-03-26T09:17:36.969Z</updated>
-    
-    <content type="html"><![CDATA[<p>节点  节点管理</p> <a id="more"></a> <h1 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h1><h2 id="节点状态"><a href="#节点状态" class="headerlink" title="节点状态"></a>节点状态</h2><p>节点的状态包含如下信息：</p><ul><li>Addresses</li><li>Conditions</li><li>Capacity and Allocatable</li><li>Info</li></ul><p>执行以下命令可查看所有节点的列表</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl get nodes -o wide</span><br></pre></td></tr></table></figure><p>执行以下命令可查看节点状态以及节点的其他详细信息： </p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl describe node &lt;your-node-name&gt;</span><br></pre></td></tr></table></figure><h3 id="Addresses"><a href="#Addresses" class="headerlink" title="Addresses"></a>Addresses</h3><ul><li>HostName： 在节点命令行界面上执行 <code>hostname</code> 命令所获得的值。启动 kubelet 时，可以通过参数 <code>--hostname-override</code> 覆盖</li><li>ExternalIP：通常是节点的外部IP（可以从集群外访问的内网IP地址；上面的例子中，此字段为空）</li><li>InternalIP：通常是从节点内部可以访问的 IP 地址</li></ul><h3 id="Conditions"><a href="#Conditions" class="headerlink" title="Conditions"></a>Conditions</h3><p><code>Conditions</code> 描述了节点的状态。Condition的例子有：</p><table><thead><tr><th>Node Condition</th><th>描述</th></tr></thead><tbody><tr><td>OutOfDisk</td><td>如果节点上的空白磁盘空间不够，不能够再添加新的节点时，该字段为 <code>True</code>，其他情况为 <code>False</code></td></tr><tr><td>Ready</td><td>如果节点是健康的且已经就绪可以接受新的 Pod。则节点Ready字段为 <code>True</code>。<code>False</code>表明了该节点不健康，不能够接受新的 Pod。</td></tr><tr><td>MemoryPressure</td><td>如果节点内存紧张，则该字段为 <code>True</code>，否则为<code>False</code></td></tr><tr><td>PIDPressure</td><td>如果节点上进程过多，则该字段为 <code>True</code>，否则为 <code>False</code></td></tr><tr><td>DiskPressure</td><td>如果节点磁盘空间紧张，则该字段为 <code>True</code>，否则为 <code>False</code></td></tr><tr><td>NetworkUnvailable</td><td>如果节点的网络配置有问题，则该字段为 <code>True</code>，否则为 <code>False</code></td></tr></tbody></table><h3 id="Capacity-and-Allocatable（容量和可分配量）"><a href="#Capacity-and-Allocatable（容量和可分配量）" class="headerlink" title="Capacity and Allocatable（容量和可分配量）"></a>Capacity and Allocatable（容量和可分配量）</h3><p>容量和可分配量（Capacity and Allocatable）描述了节点上的可用资源的情况：</p><ul><li>CPU</li><li>内存</li><li>该节点可调度的最大 pod 数量</li></ul><p>Capacity 中的字段表示节点上的资源总数，Allocatable 中的字段表示该节点上可分配给普通 Pod 的资源总数。</p><h3 id="Info"><a href="#Info" class="headerlink" title="Info"></a>Info</h3><p>描述了节点的基本信息，例如：</p><ul><li>Linux 内核版本</li><li>Kubernetes 版本（kubelet 和 kube-proxy 的版本）</li><li>Docker 版本</li><li>操作系统名称</li></ul><p>这些信息由节点上的 kubelet 收集。</p><h1 id="节点管理"><a href="#节点管理" class="headerlink" title="节点管理"></a>节点管理</h1><p>与 Pod 和 Service 不一样，节点并不是由 Kubernetes 创建的，节点由云供应商（例如，Google Compute Engine、阿里云等）创建，或者节点已经存在于您的物理机/虚拟机的资源池。向 Kubernetes 中创建节点时，仅仅是创建了一个描述该节点的 API 对象。节点 API 对象创建成功后，Kubernetes将检查该节点是否有效。</p><h2 id="节点控制器（Node-Controller）"><a href="#节点控制器（Node-Controller）" class="headerlink" title="节点控制器（Node Controller）"></a>节点控制器（Node Controller）</h2><p>节点控制器是一个负责管理节点的 Kubernetes master 组件。在节点的生命周期中，节点控制器起到了许多作用。</p><ol><li>节点控制器在注册节点时为节点分配 CIDR 地址块</li><li>节点控制器通过云供应商（cloud-controller-manager）接口检查节点列表中每一个节点对象对应的虚拟机是否可用。在云环境中，只要节点状态异常，节点控制器检查其虚拟机在云供应商的状态，如果虚拟机不可用，自动将节点对象从 APIServer 中删除。</li><li>节点控制器监控节点的健康状况。当节点变得不可触达时（例如，由于节点已停机，节点控制器不再收到来自节点的心跳信号），节点控制器将节点API对象的 <code>NodeStatus</code> Condition 取值从 <code>NodeReady</code> 更新为 <code>Unknown</code>；然后在等待 <code>pod-eviction-timeout</code> 时间后，将节点上的所有 Pod 从节点驱逐。 </li></ol><blockquote><ul><li>默认40秒未收到心跳，修改 <code>NodeStatus</code> Condition 为 <code>Unknown</code>；</li><li>默认 <code>pod-eviction-timeout</code> 为 5分钟</li><li>节点控制器每隔 <code>--node-monitor-period</code> 秒检查一次节点的状态</li></ul></blockquote><h2 id="节点自注册（Self-Registration）"><a href="#节点自注册（Self-Registration）" class="headerlink" title="节点自注册（Self-Registration）"></a>节点自注册（Self-Registration）</h2><p>如果 kubelet 的启动参数 <code>--register-node</code>为 true（默认为 true），kubelet 会尝试将自己注册到 API Server。kubelet自行注册时，将使用如下选项：</p><ul><li><code>--kubeconfig</code>：向 apiserver 进行认证时所用身份信息的路径</li><li><code>--cloud-provider</code>：向云供应商读取节点自身元数据</li><li><code>--register-node</code>：自动向 API Server 注册节点</li><li><code>--register-with-taints</code>：注册节点时，为节点添加污点（逗号分隔，格式为 <key>=<value>:<effect></effect></value></key></li><li><code>--node-ip</code>：节点的 IP 地址</li><li><code>--node-labels</code>：注册节点时，为节点添加标签</li><li><code>--node-status-update-frequency</code>：向 master 节点发送心跳信息的时间间隔</li></ul><p>如果 Node authorization mode 和 NodeRestriction admission plugin 被启用，kubelet 只拥有创建/修改其自身所对应的节点 API 对象的权限。</p><h2 id="手动管理节点"><a href="#手动管理节点" class="headerlink" title="手动管理节点"></a>手动管理节点</h2><p>如果想要手工创建节点API对象，可以将 kubelet 的启动参数 <code>--register-node</code> 设置为 false。</p><p>管理员可以修改节点API对象（不管是否设置了 <code>--register-node</code> 参数）。可以修改的内容有：</p><ul><li>增加/减少标签</li><li>标记节点为不可调度（unschedulable）</li></ul><p>节点的标签与 Pod 上的节点选择器（node selector）配合，可以控制调度方式，例如，限定 Pod 只能在某一组节点上运行。</p><p>执行如下命令可将节点标记为不可调度（unschedulable），此时将阻止新的 Pod 被调度到该节点上，但是不影响任何已经在该节点上运行的 Pod。这在准备重启节点之前非常有用。</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">kubectl</span> <span class="string">cordon</span> <span class="string">$NODENAME</span></span><br></pre></td></tr></table></figure><h2 id="节点容量（Node-Capacity）"><a href="#节点容量（Node-Capacity）" class="headerlink" title="节点容量（Node Capacity）"></a>节点容量（Node Capacity）</h2><p>Kubernetes 调度器在调度 Pod 到节点上时，将确保节点上有足够的资源。具体来说，调度器检查节点上所有容器的资源请求之和不大于节点的容量。此时，只能检查由 kubelet 启动的容器，不包括直接由容器引擎启动的容器，更不包括不在容器里运行的进程</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;节点  节点管理&lt;/p&gt;
     
     </summary>
     

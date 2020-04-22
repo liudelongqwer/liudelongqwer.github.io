@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="PV &amp; PVC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="K8s-存储卷PersistentVolume">
+<meta property="og:url" content="http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/index.html">
+<meta property="og:site_name" content="拒绝再玩">
+<meta property="og:description" content="PV &amp; PVC">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/1.jpg">
+<meta property="og:image" content="http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/1.png">
+<meta property="article:published_time" content="2020-04-17T02:58:16.000Z">
+<meta property="article:modified_time" content="2020-04-22T07:38:27.320Z">
+<meta property="article:author" content="duoyu">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/1.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>K8s-存储卷PersistentVolume | 拒绝再玩</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="拒绝再玩" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">拒绝再玩</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          K8s-存储卷PersistentVolume
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-17 10:58:16" itemprop="dateCreated datePublished" datetime="2020-04-17T10:58:16+08:00">2020-04-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-22 15:38:27" itemprop="dateModified" datetime="2020-04-22T15:38:27+08:00">2020-04-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p> PV &amp; PVC</p>
+<a id="more"></a> 
+
+<h1 id="存储卷PersistentVolume"><a href="#存储卷PersistentVolume" class="headerlink" title="存储卷PersistentVolume"></a>存储卷PersistentVolume</h1><p>PersistentVolume（PV 存储卷）是集群中的一块存储空间，由集群管理员管理、或者由 Storage Class（存储类）自动管理。PV（存储卷）和 node（节点）一样，是集群中的资源（kubernetes 集群由存储资源和计算资源组成）。</p>
+<p>PersistentVolumeClaim（存储卷声明）是一种类型的 Volume（数据卷），PersistentVolumeClaim（存储卷声明）引用的 PersistentVolume（存储卷）有自己的生命周期，该生命周期独立于任何使用它的容器组。PersistentVolume（存储卷）描述了如何提供存储的细节信息（NFS、cephfs等存储的具体参数）。</p>
+<p>PersistentVolumeClaim（PVC 存储卷声明）代表用户使用存储的请求。Pod 容器组消耗 node 计算资源，PVC 存储卷声明消耗 PersistentVolume 存储资源。Pod 容器组可以请求特定数量的计算资源（CPU / 内存）；PersistentVolumeClaim 可以请求特定大小/特定访问模式（只能被单节点读写/可被多节点只读/可被多节点读写）的存储资源。</p>
+<p>根据应用程序的特点不同，其所需要的存储资源也存在不同的要求，例如读写性能等。集群管理员必须能够提供关于 PersistentVolume（存储卷）的更多选择，无需用户关心存储卷背后的实现细节。为了解决这个问题，Kubernetes 引入了 StorageClass（存储类）的概念</p>
+<h2 id="存储卷和存储卷声明的关系"><a href="#存储卷和存储卷声明的关系" class="headerlink" title="存储卷和存储卷声明的关系"></a>存储卷和存储卷声明的关系</h2><p>存储卷和存储卷声明的关系如下图所示：</p>
+<ul>
+<li>PersistentVolume 是集群中的存储资源，通常由集群管理员创建和管理</li>
+<li>StorageClass 用于对 PersistentVolume 进行分类，如果正确配置，StorageClass 也可以根据 PersistentVolumeClaim 的请求动态创建 Persistent Volume</li>
+<li>PersistentVolumeClaim 是使用该资源的请求，通常由应用程序提出请求，并指定对应的 StorageClass 和需求的空间大小</li>
+<li>PersistentVolumeClaim 可以做为数据卷的一种，被挂载到容器组/容器中使用</li>
+</ul>
+<p><img src="/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/1.jpg" alt></p>
+<h2 id="存储卷声明的管理过程"><a href="#存储卷声明的管理过程" class="headerlink" title="存储卷声明的管理过程"></a>存储卷声明的管理过程</h2><p>PersistantVolume 和 PersistantVolumeClaim 的管理过程描述如下：</p>
+<blockquote>
+<p>下图主要描述的是 PV 和 PVC 的管理过程，因为绘制空间的问题，将挂载点与Pod关联了，实际结构应该如上图所示：</p>
+<ul>
+<li>Pod 中添加数据卷，数据卷关联PVC</li>
+<li>Pod 中包含容器，容器挂载数据卷</li>
+</ul>
+</blockquote>
+<p><img src="/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/1.png" alt></p>
+<h3 id="1-提供-Provisioning"><a href="#1-提供-Provisioning" class="headerlink" title="1.提供 Provisioning"></a>1.提供 Provisioning</h3><p>有两种方式为 PersistentVolumeClaim 提供 PersistentVolume : 静态、动态</p>
+<ul>
+<li><p><strong>静态提供 Static</strong></p>
+<p>集群管理员实现创建好一系列 PersistentVolume，它们包含了可供集群中应用程序使用的关于实际存储的具体信息。</p>
+</li>
+<li><p><strong>动态提供 Dynamic</strong></p>
+<p>在配置有合适的 StorageClass（存储类）且 PersistentVolumeClaim 关联了该 StorageClass 的情况下，kubernetes 集群可以为应用程序动态创建 PersistentVolume。</p>
+</li>
+</ul>
+<h3 id="2-绑定-Binding"><a href="#2-绑定-Binding" class="headerlink" title="2.绑定 Binding"></a>2.绑定 Binding</h3><p>假设用户创建了一个 PersistentVolumeClaim 存储卷声明，并指定了需求的存储空间大小以及访问模式。Kubernets master 将立刻为其匹配一个 PersistentVolume 存储卷，并将存储卷声明和存储卷绑定到一起。如果一个 PersistentVolume 是动态提供给一个新的 PersistentVolumeClaim，Kubernetes master 会始终将其绑定到该 PersistentVolumeClaim。除此之外，应用程序将被绑定一个不小于（可能大于）其 PersistentVolumeClaim 中请求的存储空间大小的 PersistentVolume。一旦绑定，PersistentVolumeClaim 将拒绝其他 PersistentVolume 的绑定关系。PVC 与 PV 之间的绑定关系是一对一的映射。</p>
+<p>PersistentVolumeClaim 将始终停留在 <strong><em>未绑定 unbound</em></strong> 状态，直到有合适的 PersistentVolume 可用。举个例子：集群中已经存在一个 50Gi 的 PersistentVolume，同时有一个 100Gi 的 PersistentVolumeClaim，在这种情况下，该 PVC 将一直处于 <strong><em>未绑定 unbound</em></strong> 状态，直到管理员向集群中添加了一个 100Gi 的 PersistentVolume。</p>
+<h3 id="3-使用-Using"><a href="#3-使用-Using" class="headerlink" title="3.使用 Using"></a>3.使用 Using</h3><p>对于 Pod 容器组来说，PersistentVolumeClaim 存储卷声明是一种类型的 Volume 数据卷。Kubernetes 集群将 PersistentVolumeClaim 所绑定的 PersistentVolume 挂载到容器组供其使用。</p>
+<h3 id="4-使用中保护-Storage-Object-in-Use-Protection"><a href="#4-使用中保护-Storage-Object-in-Use-Protection" class="headerlink" title="4.使用中保护 Storage Object in Use Protection"></a>4.使用中保护 Storage Object in Use Protection</h3><ul>
+<li>使用中保护的目的是确保正在被容器组使用的 PersistentVolumeClaim 以及其绑定的 PersistentVolume 不能被系统删除，以避免可能的数据丢失。</li>
+<li>如果用户删除一个正在使用中的 PersistentVolumeClaim，则该 PVC 不会立即被移除掉，而是推迟到该 PVC 不在被任何容器组使用时才移除；同样的如果管理员删除了一个已经绑定到 PVC 的 PersistentVolume，则该 PV 也不会立刻被移除掉，而是推迟到其绑定的 PVC 被删除后才移除掉</li>
+</ul>
+<h3 id="5-回收-Reclaiming"><a href="#5-回收-Reclaiming" class="headerlink" title="5.回收 Reclaiming"></a>5.回收 Reclaiming</h3><p>当用户不在需要其数据卷时，可以删除掉其 PersistentVolumeClaim，此时其对应的 PersistentVolume 将被集群回收并再利用。Kubernetes 集群根据 PersistentVolume 中的 reclaim policy（回收策略）决定在其被回收时做对应的处理。当前支持的回收策略有：Retained（保留）、Recycled（重复利用）、Deleted（删除）</p>
+<ul>
+<li><p><strong>保留 Retain</strong></p>
+<p>保留策略需要集群管理员手工回收该资源。当绑定的 PersistentVolumeClaim 被删除后，PersistentVolume 仍然存在，并被认为是”已释放“。但是此时该存储卷仍然不能被其他 PersistentVolumeClaim 绑定，因为前一个绑定的 PersistentVolumeClaim 对应容器组的数据还在其中。集群管理员可以通过如下步骤回收该 PersistentVolume：</p>
+<ul>
+<li>删除该 PersistentVolume。PV 删除后，其数据仍然存在于对应的外部存储介质中（nfs、cefpfs、glusterfs 等）</li>
+<li>手工删除对应存储介质上的数据</li>
+<li>手工删除对应的存储介质，您也可以创建一个新的 PersistentVolume 并再次使用该存储介质</li>
+</ul>
+</li>
+<li><p><strong>删除 Delete</strong></p>
+<p>删除策略将从 kubernete 集群移除 PersistentVolume 以及其关联的外部存储介质（云环境中的 AWA EBS、GCE PD、Azure Disk 或 Cinder volume）。</p>
+</li>
+<li><p><strong>再利用 Recycle</strong></p>
+<ul>
+<li>再利用策略将在 PersistentVolume 回收时，执行一个基本的清除操作（rm -rf /thevolume/*），并使其可以再次被新的 PersistentVolumeClaim 绑定。</li>
+<li>集群管理员也可以自定义一个 recycler pod template，用于执行清除操作。</li>
+</ul>
+</li>
+</ul>
+<h2 id="存储卷类型"><a href="#存储卷类型" class="headerlink" title="存储卷类型"></a>存储卷类型</h2><p>Kubernetes 支持 20 种存储卷类型，如下所示：</p>
+<ul>
+<li>非持久性存储<ul>
+<li>emptyDir</li>
+<li>HostPath (只在单节点集群上用做测试目的)</li>
+</ul>
+</li>
+<li>网络连接性存储<ul>
+<li>SAN：iSCSI、ScaleIO Volumes、FC (Fibre Channel)</li>
+<li>NFS：nfs，cfs</li>
+</ul>
+</li>
+<li>分布式存储<ul>
+<li>Glusterfs</li>
+<li>RBD (Ceph Block Device)</li>
+<li>CephFS</li>
+<li>Portworx Volumes</li>
+<li>Quobyte Volumes</li>
+</ul>
+</li>
+<li>云端存储<ul>
+<li>GCEPersistentDisk</li>
+<li>AWSElasticBlockStore</li>
+<li>AzureFile</li>
+<li>AzureDisk</li>
+<li>Cinder (OpenStack block storage)</li>
+<li>VsphereVolume</li>
+<li>StorageOS</li>
+</ul>
+</li>
+<li>自定义存储<ul>
+<li>FlexVolume</li>
+</ul>
+</li>
+<li>不推荐<ul>
+<li>Flocker</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/16/K8s-%E6%95%B0%E6%8D%AE%E5%8D%B7Volume/" rel="prev" title="K8s-数据卷Volume">
+      <i class="fa fa-chevron-left"></i> K8s-数据卷Volume
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#存储卷PersistentVolume"><span class="nav-number">1.</span> <span class="nav-text">存储卷PersistentVolume</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#存储卷和存储卷声明的关系"><span class="nav-number">1.1.</span> <span class="nav-text">存储卷和存储卷声明的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储卷声明的管理过程"><span class="nav-number">1.2.</span> <span class="nav-text">存储卷声明的管理过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-提供-Provisioning"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.提供 Provisioning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-绑定-Binding"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.绑定 Binding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-使用-Using"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.使用 Using</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-使用中保护-Storage-Object-in-Use-Protection"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.使用中保护 Storage Object in Use Protection</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-回收-Reclaiming"><span class="nav-number">1.2.5.</span> <span class="nav-text">5.回收 Reclaiming</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储卷类型"><span class="nav-number">1.3.</span> <span class="nav-text">存储卷类型</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">duoyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">duoyu</span>
+</div>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
