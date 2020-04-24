@@ -2,9 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2020/04/22/K8s-%E9%85%8D%E7%BD%AE/</loc>
+    
+    <lastmod>2020-04-24T06:58:12.808Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2020/04/22/%E6%90%AD%E5%BB%BANFS-Server/</loc>
+    
+    <lastmod>2020-04-22T07:54:44.637Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/</loc>
     
-    <lastmod>2020-04-22T07:38:27.320Z</lastmod>
+    <lastmod>2020-04-22T07:53:40.804Z</lastmod>
     
   </url>
   

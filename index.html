@@ -146,6 +146,179 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/22/K8s-%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/22/K8s-%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">K8s-配置</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-22 16:32:39" itemprop="dateCreated datePublished" datetime="2020-04-22T16:32:39+08:00">2020-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 14:58:12" itemprop="dateModified" datetime="2020-04-24T14:58:12+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Kubernetes 的配置信息管理</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/22/K8s-%E9%85%8D%E7%BD%AE/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/22/%E6%90%AD%E5%BB%BANFS-Server/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/22/%E6%90%AD%E5%BB%BANFS-Server/" class="post-title-link" itemprop="url">搭建NFS Server</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-22 15:40:54 / 修改时间：15:54:44" itemprop="dateCreated datePublished" datetime="2020-04-22T15:40:54+08:00">2020-04-22</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="搭建NFS-Server"><a href="#搭建NFS-Server" class="headerlink" title="搭建NFS Server"></a>搭建NFS Server</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>Kubernetes 对 Pod 进行调度时，以当时集群中各节点的可用资源作为主要依据，自动选择某一个可用的节点，并将 Pod 分配到该节点上。在这种情况下，Pod 中容器数据的持久化如果存储在所在节点的磁盘上，就会产生不可预知的问题，例如，当 Pod 出现故障，Kubernetes 重新调度之后，Pod 所在的新节点上，并不存在上一次 Pod 运行时所在节点上的数据。</p>
+<p>为了使 Pod 在任何节点上都能够使用同一份持久化存储数据，我们需要使用网络存储的解决方案为 Pod 提供数据卷。常用的网络存储方案有：NFS/cephfs/glusterfs。</p>
+<h2 id="配置要求"><a href="#配置要求" class="headerlink" title="配置要求"></a>配置要求</h2><ul>
+<li>两台 linux 服务器，centos 7<ul>
+<li>一台用作 nfs server</li>
+<li>另一台用作 nfs 客户端</li>
+</ul>
+</li>
+</ul>
+<h2 id="配置NFS服务器"><a href="#配置NFS服务器" class="headerlink" title="配置NFS服务器"></a>配置NFS服务器</h2><p>执行以下命令安装 nfs 服务器所需的软件包</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y nfs-utils</span><br></pre></td></tr></table></figure>
+
+<p>执行命令 <code>vim /etc/exports</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;root&#x2F;nfs_root&#x2F; *(insecure,rw,sync,no_root_squash)</span><br></pre></td></tr></table></figure>
+
+<p>执行以下命令，启动 nfs 服务</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建共享目录，如果要使用自己的目录，请替换本文档中所有的 /root/nfs_root/</span></span><br><span class="line">mkdir /root/nfs_root</span><br><span class="line"></span><br><span class="line">systemctl <span class="built_in">enable</span> rpcbind</span><br><span class="line">systemctl <span class="built_in">enable</span> nfs-server</span><br><span class="line"></span><br><span class="line">systemctl start rpcbind</span><br><span class="line">systemctl start nfs-server</span><br><span class="line">exportfs -r</span><br></pre></td></tr></table></figure>
+
+<p>检查配置是否生效</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">exportfs</span><br><span class="line"><span class="comment"># 输出结果如下所示</span></span><br><span class="line">/root/nfs_root /root/nfs_root</span><br></pre></td></tr></table></figure>
+
+<h2 id="在客户端测试NFS"><a href="#在客户端测试NFS" class="headerlink" title="在客户端测试NFS"></a>在客户端测试NFS</h2><ul>
+<li>服务器端防火墙开放111、662、875、892、2049的 tcp / udp 允许，否则远端客户无法连接。</li>
+</ul>
+<p>执行以下命令安装 nfs 客户端所需的软件包</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y nfs-utils</span><br></pre></td></tr></table></figure>
+
+<p>执行以下命令检查 nfs 服务器端是否有设置共享目录</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># showmount -e $(nfs服务器的IP)</span></span><br><span class="line">showmount -e 172.17.216.82</span><br><span class="line"><span class="comment"># 输出结果如下所示</span></span><br><span class="line">Export list <span class="keyword">for</span> 172.17.216.82:</span><br><span class="line">/root/nfs_root *</span><br></pre></td></tr></table></figure>
+
+<p>执行以下命令挂载 nfs 服务器上的共享目录到本机路径 <code>/root/nfsmount</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mkdir /root/nfsmount</span><br><span class="line"><span class="comment"># mount -t nfs $(nfs服务器的IP):/root/nfs_root /root/nfsmount</span></span><br><span class="line">mount -t nfs 172.17.216.82:/root/nfs_root /root/nfsmount</span><br><span class="line"><span class="comment"># 写入一个测试文件</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"hello nfs server"</span> &gt; /root/nfsmount/test.txt</span><br></pre></td></tr></table></figure>
+
+<p>在 nfs 服务器上执行以下命令，验证文件写入成功</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /root/nfs_root/test.txt</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -177,7 +350,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-22 15:38:27" itemprop="dateModified" datetime="2020-04-22T15:38:27+08:00">2020-04-22</time>
+                <time title="修改时间：2020-04-22 15:53:40" itemprop="dateModified" datetime="2020-04-22T15:53:40+08:00">2020-04-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -775,168 +948,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/07/%E6%8E%A7%E5%88%B6%E5%99%A8-Job/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="duoyu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="拒绝再玩">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/07/%E6%8E%A7%E5%88%B6%E5%99%A8-Job/" class="post-title-link" itemprop="url">控制器-Job</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-07 17:01:49" itemprop="dateCreated datePublished" datetime="2020-04-07T17:01:49+08:00">2020-04-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-08 10:21:57" itemprop="dateModified" datetime="2020-04-08T10:21:57+08:00">2020-04-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p> <strong>控制器-Job：</strong> 只要完成就立即退出，不需要重启或重建。 </p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/07/%E6%8E%A7%E5%88%B6%E5%99%A8-Job/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/02/%E6%8E%A7%E5%88%B6%E5%99%A8-Deployment/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="duoyu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="拒绝再玩">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/02/%E6%8E%A7%E5%88%B6%E5%99%A8-Deployment/" class="post-title-link" itemprop="url">控制器-Deployment</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-02 10:57:28" itemprop="dateCreated datePublished" datetime="2020-04-02T10:57:28+08:00">2020-04-02</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-07 15:49:10" itemprop="dateModified" datetime="2020-04-07T15:49:10+08:00">2020-04-07</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>控制器-Deployment</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/02/%E6%8E%A7%E5%88%B6%E5%99%A8-Deployment/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1007,7 +1018,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
