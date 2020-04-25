@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Kubernetes Secret 对象可以用来储存敏感信息，例如：密码、OAuth token、ssh 密钥等">
+<meta property="og:type" content="article">
+<meta property="og:title" content="K8s-Secret概述">
+<meta property="og:url" content="http://yoursite.com/2020/04/25/K8s-Secret%E6%A6%82%E8%BF%B0/index.html">
+<meta property="og:site_name" content="拒绝再玩">
+<meta property="og:description" content="Kubernetes Secret 对象可以用来储存敏感信息，例如：密码、OAuth token、ssh 密钥等">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-25T01:41:52.000Z">
+<meta property="article:modified_time" content="2020-04-25T06:17:35.152Z">
+<meta property="article:author" content="duoyu">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/04/25/K8s-Secret%E6%A6%82%E8%BF%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>K8s-Secret概述 | 拒绝再玩</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="拒绝再玩" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">拒绝再玩</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/25/K8s-Secret%E6%A6%82%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          K8s-Secret概述
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-25 09:41:52 / 修改时间：14:17:35" itemprop="dateCreated datePublished" datetime="2020-04-25T09:41:52+08:00">2020-04-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Kubernetes Secret 对象可以用来储存敏感信息，例如：密码、OAuth token、ssh 密钥等</p>
+ <a id="more"></a> 
+
+<h1 id="一、Secret概述"><a href="#一、Secret概述" class="headerlink" title="一、Secret概述"></a>一、Secret概述</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Kubernetes <code>Secret</code> 对象可以用来储存敏感信息，例如：密码、OAuth token、ssh 密钥等。如果不使用 <code>Secret</code>，此类信息可能被放置在 Pod 定义中或者容器镜像中。将此类敏感信息存储到 <code>Secret</code> 中，可以更好地：</p>
+<ul>
+<li>控制其使用</li>
+<li>降低信息泄露的风险</li>
+</ul>
+<p>用户可以直接创建 Secret，Kubernetes 系统也会创建一些 Secret。</p>
+<p>Secret有如下几种使用方式：</p>
+<ul>
+<li>作为 Pod 的数据卷挂载</li>
+<li>作为 Pod 的环境变量</li>
+<li>kubelet 在抓取容器镜像时，作为 docker 镜像仓库的用户名密码</li>
+</ul>
+<h2 id="内建Secret"><a href="#内建Secret" class="headerlink" title="内建Secret"></a>内建Secret</h2><p>Service Account 将自动创建 Secret</p>
+<p>Kubernetes 自动创建包含访问 Kubernetes APIServer 身份信息的 Secret，并自动修改 Pod 使其引用这类 Secret。</p>
+<p>如果需要，可以禁用或者自定义自动创建并使用 Kubernetes APIServer 身份信息的特性。然而，如果期望安全地访问 Kubernetes APIServer，应该使用默认的 Secret 创建使用过程。</p>
+<h2 id="自建Secret"><a href="#自建Secret" class="headerlink" title="自建Secret"></a>自建Secret</h2><p>可以使用如下方式创建自己的 Secret：</p>
+<ul>
+<li>使用 kubectl 创建 Secret</li>
+<li>手动创建 Secret</li>
+<li>使用 Generator 创建 Secret</li>
+</ul>
+<h2 id="解码和编辑"><a href="#解码和编辑" class="headerlink" title="解码和编辑"></a>解码和编辑</h2><p>Kubenetes 中，Secret 使用 base64 编码存储，您可以将其解码获得对应信息的原文，创建 Secret 之后，您也可以再次编辑Secret</p>
+<h1 id="二、创建Secret（使用kubectl）"><a href="#二、创建Secret（使用kubectl）" class="headerlink" title="二、创建Secret（使用kubectl）"></a>二、创建Secret（使用kubectl）</h1><p> 假设某个 Pod 需要访问数据库。在您执行 kubectl 命令所在机器的当前目录，创建文件 <code>./username.txt</code> 文件和 <code>./password.txt</code> 暂存数据库的用户名和密码，后续我们根据这两个文件配置 kubernetes secrets。 </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> -n <span class="string">'admin'</span> &gt; ./username.txt</span><br><span class="line"><span class="built_in">echo</span> -n <span class="string">'1f2d1e2e67df'</span> &gt; ./password.txt</span><br></pre></td></tr></table></figure>
+
+<p>在 Kubernetes APIServer 中创建 Secret 对象，并将这两个文件中的内容存储到该 Secret 对象中，执行命令，输出结果如下所示： </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0425]<span class="comment"># kubectl create secret generic db-user-pass --from-file=./username.txt --from-file=./password.txt </span></span><br><span class="line">secret/db-user-pass created</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>上述命令的执行效果与此命令执行效果相同： <code>kubectl create secret generic db-user-pass –from-literal=username=admin –from-literal=password=1f2d1e2e67df</code></p>
+</li>
+<li><p>如果密码中包含特殊字符需要转码（例如 <code>$</code>、<code>*</code>、<code>\</code>、<code>!</code>），请使用 <code>\</code> 进行转码。例如：实际密码为 <code>S!B\*d$zDsb</code>，kubectl 命令应该写成 <code>kubectl create secret generic dev-db-secret –from-literal=username=devuser –from-literal=password=S\!B\\*d\$zDsb</code>。如果通过文件创建（–from-file），则无需对文件中的密码进行转码。</p>
+<p>检查 Secret 的创建结果，输出信息如下所示： </p>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0425]<span class="comment"># kubectl get secrets</span></span><br><span class="line">NAME                  TYPE                                  DATA   AGE</span><br><span class="line">db-user-pass          Opaque                                2      57s</span><br><span class="line">default-token-xws5p   kubernetes.io/service-account-token   3      28d</span><br><span class="line">nginxsecret           Opaque                                2      15d</span><br></pre></td></tr></table></figure>
+
+<p> 查看 Secret 详情，输出信息如下所示： </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0425]<span class="comment"># kubectl describe secrets db-user-pass</span></span><br><span class="line">Name:         db-user-pass</span><br><span class="line">Namespace:    default</span><br><span class="line">Labels:       &lt;none&gt;</span><br><span class="line">Annotations:  &lt;none&gt;</span><br><span class="line"></span><br><span class="line">Type:  Opaque</span><br><span class="line"></span><br><span class="line">Data</span><br><span class="line"></span><br><span class="line">password.txt:  12 bytes</span><br><span class="line">username.txt:  5 bytes</span><br></pre></td></tr></table></figure>
+
+<p>默认情况下，<code>kubectl get</code> 和 <code>kubectl describe</code> 命令都避免展示 Secret 的内容。这种做法可以避免密码被偷窥，或者被存储到终端的日志中 </p>
+<h1 id="三创建Secret（手动）"><a href="#三创建Secret（手动）" class="headerlink" title="三创建Secret（手动）"></a>三创建Secret（手动）</h1><p>可以在 yaml 文件中定义好 Secret，然后通过 <code>kubectl apply -f</code> 命令创建。通过如下两种方式在 yaml 文件中定义 Secret：</p>
+<ul>
+<li><strong>data</strong>：使用 data 字段时，取值的内容必须是 base64 编码的</li>
+<li><strong>stringData</strong>：使用 stringData 时，更为方便，您可以直接将取值以明文的方式写在 yaml 文件中</li>
+</ul>
+<h2 id="在-yaml-中定义-data"><a href="#在-yaml-中定义-data" class="headerlink" title="在 yaml 中定义 data"></a>在 yaml 中定义 data</h2><ul>
+<li>假设要保存 <code>username=admin</code> 和 <code>password=1f2d1e2e67df</code> 到 Secret 中，要先将数据的值转化为 base64 编码，执行如下命令：</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> -n <span class="string">'admin'</span> | base64</span><br><span class="line">YWRtaW4=</span><br><span class="line"><span class="built_in">echo</span> -n <span class="string">'1f2d1e2e67df'</span> | base64</span><br><span class="line">MWYyZDFlMmU2N2Rm</span><br></pre></td></tr></table></figure>
+
+<p>创建 secret.yaml 文件，内容如下所示：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">mysecret</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">Opaque</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">YWRtaW4=</span></span><br><span class="line">  <span class="attr">password:</span> <span class="string">MWYyZDFlMmU2N2Rm</span></span><br></pre></td></tr></table></figure>
+
+<p>执行命令创建：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f .&#x2F;secret.yaml</span><br><span class="line">secret &quot;mysecret&quot; created</span><br></pre></td></tr></table></figure>
+
+<h2 id="在-yaml-中定义-stringData"><a href="#在-yaml-中定义-stringData" class="headerlink" title="在 yaml 中定义 stringData"></a>在 yaml 中定义 stringData</h2><p>假如并不想先将用户名和密码转换为 base64 编码之后再创建 Secret，则，可以通过定义 stringData 来达成，此时 stringData 中的取值部分将被 apiserver 自动进行 base64 编码之后再保存。</p>
+<ul>
+<li>创建文件 secret.yaml，内容如下所示：</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">mysecret</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">Opaque</span></span><br><span class="line"><span class="attr">stringData:</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">admin</span></span><br><span class="line">  <span class="attr">password:</span> <span class="string">1f2d1e2e67df</span></span><br></pre></td></tr></table></figure>
+
+<p>执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f .&#x2F;secret.yaml</span><br><span class="line">secret &quot;mysecret&quot; created</span><br></pre></td></tr></table></figure>
+
+<p>执行命令 <code>kubectl get -f ./secret.yaml -o yaml</code> 输出结果如下所示： </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">password:</span> <span class="string">MWYyZDFlMmU2N2Rm</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">YWRtaW4=</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">kubectl.kubernetes.io/last-applied-configuration:</span> <span class="string">|</span></span><br><span class="line">      <span class="string">&#123;"apiVersion":"v1","kind":"Secret","metadata":&#123;"annotations":&#123;&#125;,"name":"mysecret","namespace":"default"&#125;,"stringData":&#123;"password":"1f2d1e2e67df","username":"admin"&#125;,"type":"Opaque"&#125;</span></span><br><span class="line">  <span class="attr">creationTimestamp:</span> <span class="string">"2019-09-23T14:16:56Z"</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">mysecret</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">resourceVersion:</span> <span class="string">"10318365"</span></span><br><span class="line">  <span class="attr">selfLink:</span> <span class="string">/api/v1/namespaces/default/secrets/mysecret</span></span><br><span class="line">  <span class="attr">uid:</span> <span class="number">24602031</span><span class="string">-e18d-467a-b7fe-0962af8ec8b8</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">Opaque</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="同时定义了-data-和-stringData"><a href="#同时定义了-data-和-stringData" class="headerlink" title="同时定义了 data 和 stringData"></a>同时定义了 data 和 stringData</h2><p>如果同时定义了 data 和 stringData，对于两个对象中key 重复的字段，最终将采纳 stringData 中的 value </p>
+<p>创建文件 secret.yaml，该文件同时定义了 data 和 stringData，内容如下所示：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">mysecret</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">Opaque</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">YWRtaW4=</span></span><br><span class="line"><span class="attr">stringData:</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">administrator</span></span><br></pre></td></tr></table></figure>
+
+<p>执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f .&#x2F;secret.yaml</span><br><span class="line">secret &quot;mysecret&quot; created</span><br></pre></td></tr></table></figure>
+
+<p> 执行命令 <code>kubectl get -f ./secret.yaml -o yaml</code> 输出结果如下所示： </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[root@k8s-master</span> <span class="number">0425</span><span class="string">]#</span> <span class="string">kubectl</span> <span class="string">get</span> <span class="string">-f</span>  <span class="string">secret.yaml</span> <span class="string">-o</span> <span class="string">yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">YWRtaW5pc3RyYXRvcg==</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">kubectl.kubernetes.io/last-applied-configuration:</span> <span class="string">|</span></span><br><span class="line">      <span class="string">&#123;"apiVersion":"v1","data":&#123;"username":"YWRtaW4="&#125;,"kind":"Secret","metadata":&#123;"annotations":&#123;&#125;,"name":"mysecret","namespace":"default"&#125;,"stringData":&#123;"username":"administrator"&#125;,"type":"Opaque"&#125;</span></span><br><span class="line">  <span class="attr">creationTimestamp:</span> <span class="string">"2020-04-25T05:46:21Z"</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">mysecret</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">resourceVersion:</span> <span class="string">"1544704"</span></span><br><span class="line">  <span class="attr">selfLink:</span> <span class="string">/api/v1/namespaces/default/secrets/mysecret</span></span><br><span class="line">  <span class="attr">uid:</span> <span class="string">1b1d10a7-87e2-40a4-8101-693aad84eca2</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">Opaque</span></span><br></pre></td></tr></table></figure>
+
+<p> 此处 <code>YWRtaW5pc3RyYXRvcg==</code> 解码后的值是 <code>administrator</code> </p>
+<h2 id="将配置文件存入-Secret"><a href="#将配置文件存入-Secret" class="headerlink" title="将配置文件存入 Secret"></a>将配置文件存入 Secret</h2><p>假设某个应用程序需要从一个配置文件中读取敏感信息，此时，可以将该文件的内容存入 Secret，再通过数据卷的形式挂载到容器。</p>
+<p>例如，应用程序需要读取如下配置文件内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apiUrl: &quot;https:&#x2F;&#x2F;my.api.com&#x2F;api&#x2F;v1&quot;</span><br><span class="line">username: user</span><br><span class="line">password: password</span><br></pre></td></tr></table></figure>
+
+<p>可以使用下面的 secret.yaml 创建 Secret</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">mysecret</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">Opaque</span></span><br><span class="line"><span class="attr">stringData:</span></span><br><span class="line">  <span class="attr">config.yaml:</span> <span class="string">|-</span></span><br><span class="line">    <span class="attr">apiUrl:</span> <span class="string">"https://my.api.com/api/v1"</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">user</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">password</span></span><br></pre></td></tr></table></figure>
+
+<p>执行命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f ./secret.yaml</span><br><span class="line">secret <span class="string">"mysecret"</span> created</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0425]<span class="comment"># kubectl get -f secret.yaml -o yaml</span></span><br><span class="line">apiVersion: v1</span><br><span class="line">data:</span><br><span class="line">  config.yaml: YXBpVXJsOiAiaHR0cHM6Ly9teS5hcGkuY29tL2FwaS92MSIKdXNlcm5hbWU6IHVzZXIKcGFzc3dvcmQ6IHBhc3N3b3Jk</span><br><span class="line">  username: <span class="string">""</span></span><br><span class="line">kind: Secret</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    kubectl.kubernetes.io/last-applied-configuration: |</span><br><span class="line">      &#123;<span class="string">"apiVersion"</span>:<span class="string">"v1"</span>,<span class="string">"kind"</span>:<span class="string">"Secret"</span>,<span class="string">"metadata"</span>:&#123;<span class="string">"annotations"</span>:&#123;&#125;,<span class="string">"name"</span>:<span class="string">"mysecret"</span>,<span class="string">"namespace"</span>:<span class="string">"default"</span>&#125;,<span class="string">"stringData"</span>:&#123;<span class="string">"config.yaml"</span>:<span class="string">"apiUrl: \"https://my.api.com/api/v1\"\nusername: user\npassword: password"</span>&#125;,<span class="string">"type"</span>:<span class="string">"Opaque"</span>&#125;</span><br><span class="line">  creationTimestamp: <span class="string">"2020-04-25T05:46:21Z"</span></span><br><span class="line">  name: mysecret</span><br><span class="line">  namespace: default</span><br><span class="line">  resourceVersion: <span class="string">"1545171"</span></span><br><span class="line">  selfLink: /api/v1/namespaces/default/secrets/mysecret</span><br><span class="line">  uid: 1b1d10a7-87e2-40a4-8101-693aad84eca2</span><br><span class="line"><span class="built_in">type</span>: Opaque</span><br></pre></td></tr></table></figure>
+
+<h1 id="四、解码和编辑Secret"><a href="#四、解码和编辑Secret" class="headerlink" title="四、解码和编辑Secret"></a>四、解码和编辑Secret</h1><h2 id="解码Secret"><a href="#解码Secret" class="headerlink" title="解码Secret"></a>解码Secret</h2><p>Secret 中的信息可以通过 <code>kubectl get secret</code> 命令获取。</p>
+<p>执行命令 <code>kubectl get secret mysecret -o yaml</code> 可获取所创建的 Secret，输出信息如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0425]<span class="comment"># kubectl get secret mysecret -o yaml</span></span><br><span class="line">apiVersion: v1</span><br><span class="line">data:</span><br><span class="line">  config.yaml: <span class="string">""</span></span><br><span class="line">  password: MWYyZDFlMmU2N2Rm</span><br><span class="line">  username: YWRtaW4=</span><br><span class="line">kind: Secret</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    kubectl.kubernetes.io/last-applied-configuration: |</span><br><span class="line">      &#123;<span class="string">"apiVersion"</span>:<span class="string">"v1"</span>,<span class="string">"kind"</span>:<span class="string">"Secret"</span>,<span class="string">"metadata"</span>:&#123;<span class="string">"annotations"</span>:&#123;&#125;,<span class="string">"name"</span>:<span class="string">"mysecret"</span>,<span class="string">"namespace"</span>:<span class="string">"default"</span>&#125;,<span class="string">"stringData"</span>:&#123;<span class="string">"password"</span>:<span class="string">"1f2d1e2e67df"</span>,<span class="string">"username"</span>:<span class="string">"admin"</span>&#125;,<span class="string">"type"</span>:<span class="string">"Opaque"</span>&#125;</span><br><span class="line">  creationTimestamp: <span class="string">"2020-04-25T05:46:21Z"</span></span><br><span class="line">  name: mysecret</span><br><span class="line">  namespace: default</span><br><span class="line">  resourceVersion: <span class="string">"1546981"</span></span><br><span class="line">  selfLink: /api/v1/namespaces/default/secrets/mysecret</span><br><span class="line">  uid: 1b1d10a7-87e2-40a4-8101-693aad84eca2</span><br><span class="line"><span class="built_in">type</span>: Opaque</span><br></pre></td></tr></table></figure>
+
+<p> 执行命令 <code>echo &#39;MWYyZDFlMmU2N2Rm&#39; | base64 --decode</code> 可解码密码字段，输出结果如下： </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0425]<span class="comment"># echo 'MWYyZDFlMmU2N2Rm' | base64 --decode</span></span><br><span class="line">1f2d1e2e67df</span><br></pre></td></tr></table></figure>
+
+<p> 执行命令 <code>echo &#39;YWRtaW4=&#39; | base64 --decode</code> 可解码用户名字段，输出结果如下： </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0425]<span class="comment"># echo 'YWRtaW4=' | base64 --decode</span></span><br><span class="line">admin</span><br></pre></td></tr></table></figure>
+
+<h2 id="编辑Secret"><a href="#编辑Secret" class="headerlink" title="编辑Secret"></a>编辑Secret</h2><p>执行命令 <code>kubectl edit secrets mysecret</code> 可以编辑已经创建的 Secret，该命令将打开一个类似于 <code>vi</code> 的文本编辑器，可以直接编辑已经进行 base64 编码的字段，如下所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@k8s-master 0425]<span class="comment"># kubectl edit secrets mysecret</span></span><br><span class="line">Edit cancelled, no changes made.</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/K8s-%E6%B1%A1%E7%82%B9%E5%92%8C%E5%AE%B9%E5%BF%8D/" rel="prev" title="K8s-污点和容忍">
+      <i class="fa fa-chevron-left"></i> K8s-污点和容忍
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、Secret概述"><span class="nav-number">1.</span> <span class="nav-text">一、Secret概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内建Secret"><span class="nav-number">1.2.</span> <span class="nav-text">内建Secret</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自建Secret"><span class="nav-number">1.3.</span> <span class="nav-text">自建Secret</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解码和编辑"><span class="nav-number">1.4.</span> <span class="nav-text">解码和编辑</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、创建Secret（使用kubectl）"><span class="nav-number">2.</span> <span class="nav-text">二、创建Secret（使用kubectl）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三创建Secret（手动）"><span class="nav-number">3.</span> <span class="nav-text">三创建Secret（手动）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在-yaml-中定义-data"><span class="nav-number">3.1.</span> <span class="nav-text">在 yaml 中定义 data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-yaml-中定义-stringData"><span class="nav-number">3.2.</span> <span class="nav-text">在 yaml 中定义 stringData</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同时定义了-data-和-stringData"><span class="nav-number">3.3.</span> <span class="nav-text">同时定义了 data 和 stringData</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将配置文件存入-Secret"><span class="nav-number">3.4.</span> <span class="nav-text">将配置文件存入 Secret</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、解码和编辑Secret"><span class="nav-number">4.</span> <span class="nav-text">四、解码和编辑Secret</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解码Secret"><span class="nav-number">4.1.</span> <span class="nav-text">解码Secret</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑Secret"><span class="nav-number">4.2.</span> <span class="nav-text">编辑Secret</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">duoyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">duoyu</span>
+</div>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
