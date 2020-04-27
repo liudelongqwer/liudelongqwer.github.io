@@ -169,9 +169,24 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-04-26 16:47:15 / 修改时间：17:17:45" itemprop="dateCreated datePublished" datetime="2020-04-26T16:47:15+08:00">2020-04-26</time>
+              <time title="创建时间：2020-04-26 16:47:15" itemprop="dateCreated datePublished" datetime="2020-04-26T16:47:15+08:00">2020-04-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-27 09:44:58" itemprop="dateModified" datetime="2020-04-27T09:44:58+08:00">2020-04-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
             </span>
 
           
@@ -185,30 +200,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>在Kubernetes中部署应用程序时，通常会定义三个组件：</p>
-<ul>
-<li><p>一个<strong>Deployment</strong> - 这是一份用于创建你的应用程序的Pod副本的”食谱”；</p>
-</li>
-<li><p>一个<strong>Service</strong> - 一个内部负载均衡器，用于将流量路由到内部的Pod上；</p>
-</li>
-<li><p>一个<strong>Ingress</strong> - 描述如何流量应该如何从集群外部流入到集群内部的你的服务上。</p>
-<p><img src="https://kuboard.cn/statics/learning/ts/deployment/aa7dc4e26be246133054a6603aa07a77.svg" alt="img"></p>
-</li>
-</ul>
-<ol>
-<li>在Kubernetes中，应用程序通过两层负载均衡器暴露服务：内部的和外部的。</li>
-<li>内部的负载均衡器称为Service，而外部的负载均衡器称为Ingress。</li>
-<li>Pod不会直接部署。Deployment会负责创建Pod并管理它们。</li>
-</ol>
-<h2 id="一-连接Deployment和Service"><a href="#一-连接Deployment和Service" class="headerlink" title="一. 连接Deployment和Service"></a>一. 连接Deployment和Service</h2><p>令人惊讶的消息是，Service和Deployment之间根本没有连接。</p>
-<p>事实是：Service直接指向Pod，并完全跳过了Deployment。</p>
-<p>因此，应该注意的是Pod和Service之间的相互关系。</p>
-<ul>
-<li>Service selector应至少与Pod的一个标签匹配；</li>
-<li>Service的<strong>targetPort</strong>应与Pod中容器的<strong>containerPort</strong>匹配；</li>
-<li>Service的<strong>port</strong>可以是任何数字。多个Service可以使用同一端口号，因为它们被分配了不同的IP地址</li>
-</ul>
-
+          <p>问题诊断-Deployment故障排除图解（待续…）</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/26/Internet%E5%A6%82%E4%BD%95%E8%AE%BF%E9%97%AEK8s%E9%9B%86%E7%BE%A4/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
