@@ -20,15 +20,19 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="拒绝再玩">
-<meta property="og:url" content="http://yoursite.com/categories/kubernetes/page/2/index.html">
+  <meta name="description" content="prometheus 的监控项目 kube-prometheus">
+<meta property="og:type" content="article">
+<meta property="og:title" content="K8s-监控-kube-prometheus">
+<meta property="og:url" content="http://yoursite.com/2020/04/29/K8s-%E7%9B%91%E6%8E%A7-kube-prometheus/index.html">
 <meta property="og:site_name" content="拒绝再玩">
+<meta property="og:description" content="prometheus 的监控项目 kube-prometheus">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-29T06:36:32.000Z">
+<meta property="article:modified_time" content="2020-04-29T06:40:40.930Z">
 <meta property="article:author" content="duoyu">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/categories/kubernetes/page/2/">
+<link rel="canonical" href="http://yoursite.com/2020/04/29/K8s-%E7%9B%91%E6%8E%A7-kube-prometheus/">
 
 
 <script id="page-configurations">
@@ -36,12 +40,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>分类: kubernetes | 拒绝再玩</title>
+  <title>K8s-监控-kube-prometheus | 拒绝再玩</title>
   
 
 
@@ -141,233 +145,103 @@
           <div class="content">
             
 
+  <div class="posts-expand">
+      
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h1 class="collection-header">kubernetes
-          <small>分类</small>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/K8s-%E7%9B%91%E6%8E%A7-kube-prometheus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          K8s-监控-kube-prometheus
         </h1>
-      </div>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-29 14:36:32 / 修改时间：14:40:40" itemprop="dateCreated datePublished" datetime="2020-04-29T14:36:32+08:00">2020-04-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <h1 class="collection-header">2020</h1>
-    </div>
+        <p>prometheus 的监控项目 kube-prometheus</p>
+ <a id="more"></a> 
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+<h1 id="kube-prometheus"><a href="#kube-prometheus" class="headerlink" title="kube-prometheus"></a>kube-prometheus</h1><p>基于最新<a href="https://github.com/coreos/kube-prometheus开发，支持prometheus" target="_blank" rel="noopener">https://github.com/coreos/kube-prometheus开发，支持prometheus</a> 2.15.2版本，支持kubeadm方式安装的k8s，二进制方式安装的未测试</p>
+<h2 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h2><p>1.支持数据持久化</p>
+<p>2.支持kube-controller监控</p>
+<p>3.支持kube-scheduse监控</p>
+<p>4.支持kube-etcd监控</p>
+<p>5.支持NodePort访问</p>
+<p>6.支持ingress访问</p>
+<p>7.支持离线安装</p>
+<p>8.支持重复安装</p>
+<p>9.支持一键卸载</p>
+<h2 id="开始安装"><a href="#开始安装" class="headerlink" title="开始安装"></a>开始安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/chinaboy007/kube-prometheus.git</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> kube-prometheus/manifests</span><br><span class="line"></span><br><span class="line">sh install.sh</span><br></pre></td></tr></table></figure>
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-22T15:40:54+08:00"
-              content="2020-04-22">
-          04-22
-        </time>
-      </div>
+<h2 id="默认启用nfs-client数据持久化"><a href="#默认启用nfs-client数据持久化" class="headerlink" title="默认启用nfs-client数据持久化"></a>默认启用nfs-client数据持久化</h2><h2 id="一键卸载"><a href="#一键卸载" class="headerlink" title="一键卸载"></a>一键卸载</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd kube-prometheus&#x2F;manifests</span><br><span class="line">sh uninstall.sh</span><br></pre></td></tr></table></figure>
 
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/22/%E6%90%AD%E5%BB%BANFS-Server/" itemprop="url">
-            <span itemprop="name">搭建NFS Server</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-17T10:58:16+08:00"
-              content="2020-04-17">
-          04-17
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/17/K8s-%E5%AD%98%E5%82%A8%E5%8D%B7PersistentVolume/" itemprop="url">
-            <span itemprop="name">K8s-存储卷PersistentVolume</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-16T16:09:30+08:00"
-              content="2020-04-16">
-          04-16
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/16/K8s-%E6%95%B0%E6%8D%AE%E5%8D%B7Volume/" itemprop="url">
-            <span itemprop="name">K8s-数据卷Volume</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-14T14:55:20+08:00"
-              content="2020-04-14">
-          04-14
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/14/Kubernetes%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/" itemprop="url">
-            <span itemprop="name">Kubernetes网络模型</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-10T16:59:31+08:00"
-              content="2020-04-10">
-          04-10
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/10/K8s-%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/" itemprop="url">
-            <span itemprop="name">K8s-网络策略</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-10T15:05:26+08:00"
-              content="2020-04-10">
-          04-10
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/10/%E9%80%9A%E8%BF%87Ingress%E8%AE%BF%E9%97%AE%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F/" itemprop="url">
-            <span itemprop="name">通过Ingress访问应用程序</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-08T16:00:56+08:00"
-              content="2020-04-08">
-          04-08
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/08/K8s-Service%E8%BF%9E%E6%8E%A5%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F/" itemprop="url">
-            <span itemprop="name">K8s-Service连接应用程序</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-08T13:30:32+08:00"
-              content="2020-04-08">
-          04-08
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/08/K8s-Service/" itemprop="url">
-            <span itemprop="name">K8s-Service</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-08T10:20:54+08:00"
-              content="2020-04-08">
-          04-08
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/08/%E6%8E%A7%E5%88%B6%E5%99%A8-CronJob/" itemprop="url">
-            <span itemprop="name">控制器-CronJob</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2020-04-07T17:01:49+08:00"
-              content="2020-04-07">
-          04-07
-        </time>
-      </div>
-
-      <h2 class="post-title">
-          <a class="post-title-link" href="/2020/04/07/%E6%8E%A7%E5%88%B6%E5%99%A8-Job/" itemprop="url">
-            <span itemprop="name">控制器-Job</span>
-          </a>
-      </h2>
-
-    </header>
-  </article>
 
     </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/29/%E9%85%8D%E7%BD%AEKubelet%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" rel="prev" title="配置Kubelet的垃圾回收">
+      <i class="fa fa-chevron-left"></i> 配置Kubelet的垃圾回收
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
-  
-  
-  
-
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/categories/kubernetes/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/categories/kubernetes/">1</a><span class="page-number current">2</span><a class="page-number" href="/categories/kubernetes/page/3/">3</a><a class="page-number" href="/categories/kubernetes/page/4/">4</a><a class="extend next" rel="next" href="/categories/kubernetes/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
-
 
 
           </div>
@@ -418,6 +292,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#kube-prometheus"><span class="nav-number">1.</span> <span class="nav-text">kube-prometheus</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#主要功能"><span class="nav-number">1.1.</span> <span class="nav-text">主要功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开始安装"><span class="nav-number">1.2.</span> <span class="nav-text">开始安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#默认启用nfs-client数据持久化"><span class="nav-number">1.3.</span> <span class="nav-text">默认启用nfs-client数据持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一键卸载"><span class="nav-number">1.4.</span> <span class="nav-text">一键卸载</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

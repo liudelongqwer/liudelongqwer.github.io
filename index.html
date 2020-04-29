@@ -146,6 +146,81 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/K8s-%E7%9B%91%E6%8E%A7-kube-prometheus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="duoyu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="拒绝再玩">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/29/K8s-%E7%9B%91%E6%8E%A7-kube-prometheus/" class="post-title-link" itemprop="url">K8s-监控-kube-prometheus</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-29 14:36:32 / 修改时间：14:40:40" itemprop="dateCreated datePublished" datetime="2020-04-29T14:36:32+08:00">2020-04-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>prometheus 的监控项目 kube-prometheus</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/29/K8s-%E7%9B%91%E6%8E%A7-kube-prometheus/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/%E9%85%8D%E7%BD%AEKubelet%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -171,7 +246,16 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-04-29 14:32:22 / 修改时间：14:34:36" itemprop="dateCreated datePublished" datetime="2020-04-29T14:32:22+08:00">2020-04-29</time>
+              <time title="创建时间：2020-04-29 14:32:22 / 修改时间：14:37:14" itemprop="dateCreated datePublished" datetime="2020-04-29T14:32:22+08:00">2020-04-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
             </span>
 
           
@@ -185,80 +269,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="配置Kubelet的垃圾回收"><a href="#配置Kubelet的垃圾回收" class="headerlink" title="配置Kubelet的垃圾回收"></a>配置Kubelet的垃圾回收</h1><p>Kubelet的垃圾回收功能可以清理不再使用的容器和镜像，kubelet对容器进行垃圾回收的频率是每分钟一次，对镜像进行垃圾回收的频率是每五分钟一次。</p>
-<p>不推荐使用外部的垃圾回收工具，因为这些工具有可能会删除 kubelet 仍然需要的容器或者镜像。</p>
-<h2 id="镜像回收"><a href="#镜像回收" class="headerlink" title="镜像回收"></a>镜像回收</h2><p>Kubernetes 通过 imageManager 配合 cadvisor 管理所有镜像的生命周期。</p>
-<p>镜像的垃圾回收策略主要考虑两方面因素： <code>HighThresholdPercent</code> 和 <code>LowThresholdPercent</code>。</p>
-<ul>
-<li>磁盘利用率超过 <code>high threshold</code> 将触发垃圾回收动作</li>
-<li>垃圾回收功能将删除最近最少使用的镜像，直到磁盘利用率低于 <code>low threshold</code></li>
-</ul>
-<h2 id="容器回收"><a href="#容器回收" class="headerlink" title="容器回收"></a>容器回收</h2><p>容器的垃圾回收侧率主要考虑三个用户自定义的变量：</p>
-<ul>
-<li><code>MinAge</code>： 容器创建到现在的最小时长，低于此时长的不能被垃圾回收；如果设置为 0，则禁用该选项</li>
-<li><code>MaxPerPodContainer</code>：以 <code>Pod UID</code> + <code>容器名</code> 作为组合键，<code>MaxPerPodContainer</code> 指定了同一个 <code>Pod UID</code> + <code>容器名</code> 组合键下可以包含的已停止容器的最大数量。如果设置为小于 0 的数值，则禁用该选项</li>
-<li><code>MaxContainers</code>： 指定了最大的已停止容器的数量。如果设置为小于 0 的数值，则禁用该选项</li>
-</ul>
-<p>Kubelet 将对满足上述三个条件，且已经停止的容器执行垃圾回收的动作。通常，创建时间最长的容器将被最早移除。 <code>MaxPerPodContainer</code> 和 <code>MaxContainer</code> 这两个参数可能会相互冲突，例如， 如果要为每个 Pod 保存 <code>MaxPerPodContainer</code> 个已停止容器的话，可能最终总的已停止的容器的数量要超过 <code>MaxContainers</code> 的定义。 此时，优先保证 <code>MaxContainers</code> 的限定， <code>MaxPerPodContainer</code> 将被重新调整：最坏的情况下，kubelet 将 <code>MaxPerPodContainer</code> 的要求降低到 1，并删除创建时间最久的已停止的容器。此外，当 Pod 的已停止容器创建时长超过 <code>MinAge</code> 时，该容器将被即刻删除。</p>
-<p>对于那些不是通过 kubelet 创建的容器，kubelet 不能对其进行垃圾回收操作。</p>
-<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>通过以下 kubelet 启动参数，可以调整镜像垃圾回收的变量：</p>
-<ul>
-<li><code>image-gc-high-threshold</code>，磁盘利用率高于此参数时，将触发镜像的垃圾回收。默认值为 85%</li>
-<li><code>iamge-gc-low-threshold</code>，磁盘利用率低于此参数时，镜像的垃圾回收将停止。默认值为 80%</li>
-</ul>
-<p>通过以下 kubelet 启动参数，可以调整容器的垃圾回收的变量：</p>
-<ul>
-<li><code>minimum-container-ttl-duration</code>，容器创建到现在的最小时长，低于此时长的不能被垃圾回收。默认值为 0 分钟，即，每一个已停止的容器都可以被垃圾回收</li>
-<li><code>maximum-dead-containers-per-container</code>，对于每个容器的旧实例，最多可以保留的个数。默认值为 1</li>
-<li><code>maximum-dead-containers</code>，全局最大可以保留的已停止的容器数量。默认值为 -1，即，不做全局性限制</li>
-</ul>
-<p>容器在被垃圾回收时，也许仍然是有用的。例如，这些容器可能包含了对于问题诊断（trouble shooting）来说非常有用的日志和数据。强烈建议将 <code>maximum-dead-containers-per-container</code> 设置为足够大的数值，至少不能小于1，以便为每一个容器至少保留一个已停止的容器。同样的，也建议为 <code>maximum-dead-containers</code> 设置一个比较大的数值。</p>
-<h2 id="Deprecation"><a href="#Deprecation" class="headerlink" title="Deprecation"></a>Deprecation</h2><p>此文档的某些特性已经不推荐使用，未来将被 kubelet eviction 替代，包括：</p>
-<table>
-<thead>
-<tr>
-<th>Existing Flag</th>
-<th>New Flag</th>
-<th>Rationale</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>--image-gc-high-threshold</code></td>
-<td><code>--eviction-hard</code> or <code>--eviction-soft</code></td>
-<td>已有的 eviction 信号可以触发镜像的垃圾回收</td>
-</tr>
-<tr>
-<td><code>--image-gc-low-threshold</code></td>
-<td><code>--eviction-minimum-reclaim</code></td>
-<td>eviction reclaims 可实现相同的效果</td>
-</tr>
-<tr>
-<td><code>--maximum-dead-containers</code></td>
-<td></td>
-<td>如果日志被存储在容器外部，就不推荐使用此特性</td>
-</tr>
-<tr>
-<td><code>--maximum-dead-containers-per-container</code></td>
-<td></td>
-<td>如果日志被存储在容器外部，就不推荐使用此特性</td>
-</tr>
-<tr>
-<td><code>--minimum-container-ttl-duration</code></td>
-<td></td>
-<td>如果日志被存储在容器外部，就不推荐使用此特性</td>
-</tr>
-<tr>
-<td><code>--low-diskspace-threshold-mb</code></td>
-<td><code>--eviction-hard</code> or <code>eviction-soft</code></td>
-<td>eviction 通过其他资源判断是否要垃圾回收，而不再通过磁盘利用率这个参数</td>
-</tr>
-<tr>
-<td><code>--outofdisk-transition-frequency</code></td>
-<td><code>--eviction-pressure-transition-period</code></td>
-<td>eviction generalizes disk pressure transition to other resources</td>
-</tr>
-</tbody></table>
-
+          <p> Kubelet的垃圾回收功能</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/04/29/%E9%85%8D%E7%BD%AEKubelet%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -897,87 +916,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/22/%E6%90%AD%E5%BB%BANFS-Server/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="duoyu">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="拒绝再玩">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/04/22/%E6%90%AD%E5%BB%BANFS-Server/" class="post-title-link" itemprop="url">搭建NFS Server</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-04-22 15:40:54" itemprop="dateCreated datePublished" datetime="2020-04-22T15:40:54+08:00">2020-04-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-04-25 14:18:54" itemprop="dateModified" datetime="2020-04-25T14:18:54+08:00">2020-04-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>搭建 NFS 服务器</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/04/22/%E6%90%AD%E5%BB%BANFS-Server/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1048,7 +986,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

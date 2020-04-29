@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2020/04/29/K8s-%E7%9B%91%E6%8E%A7-kube-prometheus/</loc>
+    
+    <lastmod>2020-04-29T06:40:40.930Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/04/29/%E9%85%8D%E7%BD%AEKubelet%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/</loc>
     
-    <lastmod>2020-04-29T06:34:36.645Z</lastmod>
+    <lastmod>2020-04-29T06:37:14.878Z</lastmod>
     
   </url>
   

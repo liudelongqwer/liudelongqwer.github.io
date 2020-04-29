@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="配置Kubelet的垃圾回收Kubelet的垃圾回收功能可以清理不再使用的容器和镜像，kubelet对容器进行垃圾回收的频率是每分钟一次，对镜像进行垃圾回收的频率是每五分钟一次。 不推荐使用外部的垃圾回收工具，因为这些工具有可能会删除 kubelet 仍然需要的容器或者镜像。 镜像回收Kubernetes 通过 imageManager 配合 cadvisor 管理所有镜像的生命周期。 镜像的垃圾">
+  <meta name="description" content="Kubelet的垃圾回收功能">
 <meta property="og:type" content="article">
 <meta property="og:title" content="配置Kubelet的垃圾回收">
 <meta property="og:url" content="http://yoursite.com/2020/04/29/%E9%85%8D%E7%BD%AEKubelet%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/index.html">
 <meta property="og:site_name" content="拒绝再玩">
-<meta property="og:description" content="配置Kubelet的垃圾回收Kubelet的垃圾回收功能可以清理不再使用的容器和镜像，kubelet对容器进行垃圾回收的频率是每分钟一次，对镜像进行垃圾回收的频率是每五分钟一次。 不推荐使用外部的垃圾回收工具，因为这些工具有可能会删除 kubelet 仍然需要的容器或者镜像。 镜像回收Kubernetes 通过 imageManager 配合 cadvisor 管理所有镜像的生命周期。 镜像的垃圾">
+<meta property="og:description" content="Kubelet的垃圾回收功能">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-04-29T06:32:22.000Z">
-<meta property="article:modified_time" content="2020-04-29T06:34:36.645Z">
+<meta property="article:modified_time" content="2020-04-29T06:37:14.878Z">
 <meta property="article:author" content="duoyu">
 <meta name="twitter:card" content="summary">
 
@@ -174,7 +174,16 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-04-29 14:32:22 / 修改时间：14:34:36" itemprop="dateCreated datePublished" datetime="2020-04-29T14:32:22+08:00">2020-04-29</time>
+              <time title="创建时间：2020-04-29 14:32:22 / 修改时间：14:37:14" itemprop="dateCreated datePublished" datetime="2020-04-29T14:32:22+08:00">2020-04-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index"><span itemprop="name">kubernetes</span></a>
+                </span>
             </span>
 
           
@@ -188,7 +197,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="配置Kubelet的垃圾回收"><a href="#配置Kubelet的垃圾回收" class="headerlink" title="配置Kubelet的垃圾回收"></a>配置Kubelet的垃圾回收</h1><p>Kubelet的垃圾回收功能可以清理不再使用的容器和镜像，kubelet对容器进行垃圾回收的频率是每分钟一次，对镜像进行垃圾回收的频率是每五分钟一次。</p>
+        <p> Kubelet的垃圾回收功能</p>
+<a id="more"></a> 
+
+<h1 id="配置Kubelet的垃圾回收"><a href="#配置Kubelet的垃圾回收" class="headerlink" title="配置Kubelet的垃圾回收"></a>配置Kubelet的垃圾回收</h1><p>Kubelet的垃圾回收功能可以清理不再使用的容器和镜像，kubelet对容器进行垃圾回收的频率是每分钟一次，对镜像进行垃圾回收的频率是每五分钟一次。</p>
 <p>不推荐使用外部的垃圾回收工具，因为这些工具有可能会删除 kubelet 仍然需要的容器或者镜像。</p>
 <h2 id="镜像回收"><a href="#镜像回收" class="headerlink" title="镜像回收"></a>镜像回收</h2><p>Kubernetes 通过 imageManager 配合 cadvisor 管理所有镜像的生命周期。</p>
 <p>镜像的垃圾回收策略主要考虑两方面因素： <code>HighThresholdPercent</code> 和 <code>LowThresholdPercent</code>。</p>
@@ -279,7 +291,10 @@
     <a href="/2020/04/29/K8s-%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/" rel="prev" title="K8s-调度问题">
       <i class="fa fa-chevron-left"></i> K8s-调度问题
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/29/K8s-%E7%9B%91%E6%8E%A7-kube-prometheus/" rel="next" title="K8s-监控-kube-prometheus">
+      K8s-监控-kube-prometheus <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -353,7 +368,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
