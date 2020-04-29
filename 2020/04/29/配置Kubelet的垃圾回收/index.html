@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="hexo 搭建、部署、操作；">
+  <meta name="description" content="配置Kubelet的垃圾回收Kubelet的垃圾回收功能可以清理不再使用的容器和镜像，kubelet对容器进行垃圾回收的频率是每分钟一次，对镜像进行垃圾回收的频率是每五分钟一次。 不推荐使用外部的垃圾回收工具，因为这些工具有可能会删除 kubelet 仍然需要的容器或者镜像。 镜像回收Kubernetes 通过 imageManager 配合 cadvisor 管理所有镜像的生命周期。 镜像的垃圾">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hexo 使用">
-<meta property="og:url" content="http://yoursite.com/2020/03/19/hexo%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:title" content="配置Kubelet的垃圾回收">
+<meta property="og:url" content="http://yoursite.com/2020/04/29/%E9%85%8D%E7%BD%AEKubelet%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/index.html">
 <meta property="og:site_name" content="拒绝再玩">
-<meta property="og:description" content="hexo 搭建、部署、操作；">
+<meta property="og:description" content="配置Kubelet的垃圾回收Kubelet的垃圾回收功能可以清理不再使用的容器和镜像，kubelet对容器进行垃圾回收的频率是每分钟一次，对镜像进行垃圾回收的频率是每五分钟一次。 不推荐使用外部的垃圾回收工具，因为这些工具有可能会删除 kubelet 仍然需要的容器或者镜像。 镜像回收Kubernetes 通过 imageManager 配合 cadvisor 管理所有镜像的生命周期。 镜像的垃圾">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-03-19T09:18:36.000Z">
-<meta property="article:modified_time" content="2020-03-23T07:14:57.409Z">
+<meta property="article:published_time" content="2020-04-29T06:32:22.000Z">
+<meta property="article:modified_time" content="2020-04-29T06:34:36.645Z">
 <meta property="article:author" content="duoyu">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/2020/03/19/hexo%E4%BD%BF%E7%94%A8/">
+<link rel="canonical" href="http://yoursite.com/2020/04/29/%E9%85%8D%E7%BD%AEKubelet%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
 
 
 <script id="page-configurations">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>hexo 使用 | 拒绝再玩</title>
+  <title>配置Kubelet的垃圾回收 | 拒绝再玩</title>
   
 
 
@@ -150,7 +150,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/19/hexo%E4%BD%BF%E7%94%A8/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/29/%E9%85%8D%E7%BD%AEKubelet%E7%9A%84%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -163,7 +163,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          hexo 使用
+          配置Kubelet的垃圾回收
         </h1>
 
         <div class="post-meta">
@@ -172,24 +172,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-03-19 17:18:36" itemprop="dateCreated datePublished" datetime="2020-03-19T17:18:36+08:00">2020-03-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-03-23 15:14:57" itemprop="dateModified" datetime="2020-03-23T15:14:57+08:00">2020-03-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
-                </span>
+              <time title="创建时间：2020-04-29 14:32:22 / 修改时间：14:34:36" itemprop="dateCreated datePublished" datetime="2020-04-29T14:32:22+08:00">2020-04-29</time>
             </span>
 
           
@@ -203,79 +188,79 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>hexo 搭建、部署、操作；</p>
- <a id="more"></a> 
-
-<p>_config.yml配置git</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:  </span><br><span class="line">  type: &#39;git&#39;  </span><br><span class="line">  repo: git@github.com:yourname&#x2F;yourname.github.io.git  </span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
-
-<h5 id="上传github，推送文件步骤："><a href="#上传github，推送文件步骤：" class="headerlink" title="上传github，推送文件步骤："></a>上传github，推送文件步骤：</h5><p>hexo clean      hexo c   清除缓存文件 (db.json) 和已生成的静态文件 (public) </p>
-<p>hexo generate   hexo g   生成静态文件 </p>
-<p>hexo deploy     hexo d   部署网站 </p>
-<p>执行端口启动：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo s -i 0.0.0.0 -p 8080</span><br></pre></td></tr></table></figure>
-
-<p>绑定个人域名：</p>
-<p>解析域名注意，博客网址中必须使用你github的用户名.</p>
-<p><strong>布局（Layout）</strong></p>
-<p>Hexo 有三种默认布局：post、page 和 draft。在创建者三种不同类型的文件时，它们将会被保存到不同的路径；而您自定义的其他布局和 post 相同，都将储存到 source/_posts 文件夹。</p>
+        <h1 id="配置Kubelet的垃圾回收"><a href="#配置Kubelet的垃圾回收" class="headerlink" title="配置Kubelet的垃圾回收"></a>配置Kubelet的垃圾回收</h1><p>Kubelet的垃圾回收功能可以清理不再使用的容器和镜像，kubelet对容器进行垃圾回收的频率是每分钟一次，对镜像进行垃圾回收的频率是每五分钟一次。</p>
+<p>不推荐使用外部的垃圾回收工具，因为这些工具有可能会删除 kubelet 仍然需要的容器或者镜像。</p>
+<h2 id="镜像回收"><a href="#镜像回收" class="headerlink" title="镜像回收"></a>镜像回收</h2><p>Kubernetes 通过 imageManager 配合 cadvisor 管理所有镜像的生命周期。</p>
+<p>镜像的垃圾回收策略主要考虑两方面因素： <code>HighThresholdPercent</code> 和 <code>LowThresholdPercent</code>。</p>
+<ul>
+<li>磁盘利用率超过 <code>high threshold</code> 将触发垃圾回收动作</li>
+<li>垃圾回收功能将删除最近最少使用的镜像，直到磁盘利用率低于 <code>low threshold</code></li>
+</ul>
+<h2 id="容器回收"><a href="#容器回收" class="headerlink" title="容器回收"></a>容器回收</h2><p>容器的垃圾回收侧率主要考虑三个用户自定义的变量：</p>
+<ul>
+<li><code>MinAge</code>： 容器创建到现在的最小时长，低于此时长的不能被垃圾回收；如果设置为 0，则禁用该选项</li>
+<li><code>MaxPerPodContainer</code>：以 <code>Pod UID</code> + <code>容器名</code> 作为组合键，<code>MaxPerPodContainer</code> 指定了同一个 <code>Pod UID</code> + <code>容器名</code> 组合键下可以包含的已停止容器的最大数量。如果设置为小于 0 的数值，则禁用该选项</li>
+<li><code>MaxContainers</code>： 指定了最大的已停止容器的数量。如果设置为小于 0 的数值，则禁用该选项</li>
+</ul>
+<p>Kubelet 将对满足上述三个条件，且已经停止的容器执行垃圾回收的动作。通常，创建时间最长的容器将被最早移除。 <code>MaxPerPodContainer</code> 和 <code>MaxContainer</code> 这两个参数可能会相互冲突，例如， 如果要为每个 Pod 保存 <code>MaxPerPodContainer</code> 个已停止容器的话，可能最终总的已停止的容器的数量要超过 <code>MaxContainers</code> 的定义。 此时，优先保证 <code>MaxContainers</code> 的限定， <code>MaxPerPodContainer</code> 将被重新调整：最坏的情况下，kubelet 将 <code>MaxPerPodContainer</code> 的要求降低到 1，并删除创建时间最久的已停止的容器。此外，当 Pod 的已停止容器创建时长超过 <code>MinAge</code> 时，该容器将被即刻删除。</p>
+<p>对于那些不是通过 kubelet 创建的容器，kubelet 不能对其进行垃圾回收操作。</p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>通过以下 kubelet 启动参数，可以调整镜像垃圾回收的变量：</p>
+<ul>
+<li><code>image-gc-high-threshold</code>，磁盘利用率高于此参数时，将触发镜像的垃圾回收。默认值为 85%</li>
+<li><code>iamge-gc-low-threshold</code>，磁盘利用率低于此参数时，镜像的垃圾回收将停止。默认值为 80%</li>
+</ul>
+<p>通过以下 kubelet 启动参数，可以调整容器的垃圾回收的变量：</p>
+<ul>
+<li><code>minimum-container-ttl-duration</code>，容器创建到现在的最小时长，低于此时长的不能被垃圾回收。默认值为 0 分钟，即，每一个已停止的容器都可以被垃圾回收</li>
+<li><code>maximum-dead-containers-per-container</code>，对于每个容器的旧实例，最多可以保留的个数。默认值为 1</li>
+<li><code>maximum-dead-containers</code>，全局最大可以保留的已停止的容器数量。默认值为 -1，即，不做全局性限制</li>
+</ul>
+<p>容器在被垃圾回收时，也许仍然是有用的。例如，这些容器可能包含了对于问题诊断（trouble shooting）来说非常有用的日志和数据。强烈建议将 <code>maximum-dead-containers-per-container</code> 设置为足够大的数值，至少不能小于1，以便为每一个容器至少保留一个已停止的容器。同样的，也建议为 <code>maximum-dead-containers</code> 设置一个比较大的数值。</p>
+<h2 id="Deprecation"><a href="#Deprecation" class="headerlink" title="Deprecation"></a>Deprecation</h2><p>此文档的某些特性已经不推荐使用，未来将被 kubelet eviction 替代，包括：</p>
 <table>
 <thead>
 <tr>
-<th>布局</th>
-<th>路径</th>
+<th>Existing Flag</th>
+<th>New Flag</th>
+<th>Rationale</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>post</td>
-<td>source/_posts</td>
+<td><code>--image-gc-high-threshold</code></td>
+<td><code>--eviction-hard</code> or <code>--eviction-soft</code></td>
+<td>已有的 eviction 信号可以触发镜像的垃圾回收</td>
 </tr>
 <tr>
-<td>page</td>
-<td>source</td>
+<td><code>--image-gc-low-threshold</code></td>
+<td><code>--eviction-minimum-reclaim</code></td>
+<td>eviction reclaims 可实现相同的效果</td>
 </tr>
 <tr>
-<td>draft</td>
-<td>source/_drafts</td>
+<td><code>--maximum-dead-containers</code></td>
+<td></td>
+<td>如果日志被存储在容器外部，就不推荐使用此特性</td>
+</tr>
+<tr>
+<td><code>--maximum-dead-containers-per-container</code></td>
+<td></td>
+<td>如果日志被存储在容器外部，就不推荐使用此特性</td>
+</tr>
+<tr>
+<td><code>--minimum-container-ttl-duration</code></td>
+<td></td>
+<td>如果日志被存储在容器外部，就不推荐使用此特性</td>
+</tr>
+<tr>
+<td><code>--low-diskspace-threshold-mb</code></td>
+<td><code>--eviction-hard</code> or <code>eviction-soft</code></td>
+<td>eviction 通过其他资源判断是否要垃圾回收，而不再通过磁盘利用率这个参数</td>
+</tr>
+<tr>
+<td><code>--outofdisk-transition-frequency</code></td>
+<td><code>--eviction-pressure-transition-period</code></td>
+<td>eviction generalizes disk pressure transition to other resources</td>
 </tr>
 </tbody></table>
-<p><strong>hexo init</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo init [ folder]</span><br></pre></td></tr></table></figure>
-
-<p>新建一个网站。如果没有设置 folder ，Hexo 默认在目前的文件夹建立网站。</p>
-<p><strong>hexo new</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new [layout] &lt;title&gt;</span><br></pre></td></tr></table></figure>
-
-<p>新建一篇文章。如果没有设置 layout 的话，默认使用 _config.yml 中的 default_layout 参数代替。如果标题包含空格的话，请使用引号括起来。</p>
-<p>hexo new “post title with whitespace” </p>
-<table>
-<thead>
-<tr>
-<th>参数</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>-p, –path</td>
-<td>自定义新文章的路径</td>
-</tr>
-<tr>
-<td>-r, –replace</td>
-<td>如果存在同名文章，将其替换</td>
-</tr>
-<tr>
-<td>-s, –slug</td>
-<td>文章的 Slug，作为新文章的文件名和发布后的 URL</td>
-</tr>
-</tbody></table>
-<p>默认情况下，Hexo 会使用文章的标题来决定文章文件的路径。对于独立页面来说，Hexo 会创建一个以标题为名字的目录，并在目录中放置一个 index.md 文件。你可以使用 –path 参数来覆盖上述行为、自行决定文件的目录：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page --path about&#x2F;me &quot;About me&quot;</span><br></pre></td></tr></table></figure>
-
-<p>以上命令会创建一个 source/about/me.md 文件，同时 Front Matter 中的 title 为 “About me”</p>
-<p>注意！title 是必须指定的！如果你这么做并不能达到你的目的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page --path about&#x2F;me</span><br></pre></td></tr></table></figure>
-
-<p>此时 Hexo 会创建 source/_posts/about/me.md，同时 me.md 的 Front Matter 中的 title 为 “page”。这是因为在上述命令中，hexo-cli 将 page 视为指定文章的标题、并采用默认的 layout。</p>
 
     </div>
 
@@ -290,11 +275,11 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2020/03/20/Kubernetes%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5/" rel="next" title="Kubernetes核心概念">
-      Kubernetes核心概念 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/04/29/K8s-%E8%B0%83%E5%BA%A6%E9%97%AE%E9%A2%98/" rel="prev" title="K8s-调度问题">
+      <i class="fa fa-chevron-left"></i> K8s-调度问题
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -354,7 +339,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#上传github，推送文件步骤："><span class="nav-number">1.</span> <span class="nav-text">上传github，推送文件步骤：</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#配置Kubelet的垃圾回收"><span class="nav-number">1.</span> <span class="nav-text">配置Kubelet的垃圾回收</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#镜像回收"><span class="nav-number">1.1.</span> <span class="nav-text">镜像回收</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#容器回收"><span class="nav-number">1.2.</span> <span class="nav-text">容器回收</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">1.3.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Deprecation"><span class="nav-number">1.4.</span> <span class="nav-text">Deprecation</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
